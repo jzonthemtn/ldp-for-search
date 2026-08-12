@@ -335,7 +335,7 @@ SLIDES = [
 
     ("title", {
         "title": "Questions",
-        "subtitle": "Notebook, data and plots: github.com/jzonthemtn",
+        "subtitle": "github.com/jzonthemtn/ldp-for-search",
         "footer": "Jeff Zemerick",
         "event": "OpenSearchCon, San Jose",
         "date": "September 24, 2026",
