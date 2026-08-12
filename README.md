@@ -65,6 +65,9 @@ swaps in a real 43,000-product index.
    versus the noised query.
 10. The same mechanism against 42,994 real Wayfair products, scoring the attacker on
     item-level and class-level recovery separately.
+11. What survives the noise. Cohorts of users built from the 480 real WANDS queries, each user
+    privatizing independently, showing that individual queries stay hidden while cohort-level
+    trends are recovered exactly.
 
 ## Where the tradeoff sits on the toy index
 
@@ -116,6 +119,28 @@ Note that the useful epsilon range here, 10 to 50, looks nothing like the toy in
 Laplace scale is `sensitivity / epsilon`, and what matters is its size relative to the spread of
 the vector coordinates, which differs between the two PCA fits. Epsilon is not portable across
 indexes.
+
+## What survives the noise
+
+Section 11 is the counterweight to sections 7 and 10. Those measure what LDP costs. This one
+measures what it keeps, which is the reason to use it at all.
+
+The noise is zero-mean, so it cancels when averaged across independent users. At `epsilon = 1.0`,
+heavier noise than anything in section 10, all five cohorts are identified correctly from the
+noised data, while individual recovery stays at roughly chance. The estimation error falls as
+`1 / sqrt(n)`:
+
+| users | centroid error |
+|------:|---------------:|
+|    10 |          2.098 |
+|   100 |          0.638 |
+| 1,000 |          0.194 |
+| 10,000 |         0.066 |
+| 100,000 |        0.020 |
+
+The spread of the index itself is 0.128, which the error crosses at roughly 2,500 users. That is
+the practical threshold. Segments with thousands of users are measurable under LDP. Segments with
+dozens are not.
 
 ## Knobs
 
