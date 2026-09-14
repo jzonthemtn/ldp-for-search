@@ -356,7 +356,7 @@ def trust_boundary(path):
             fontsize=11, color=ACCENT, fontweight="bold")
 
     for cy, text, filled in ((5.30, "raw query vector", False),
-                             (4.00, "ubi.js adds noise", False),
+                             (4.00, "your code adds noise", False),
                              (2.70, "noised vector", True)):
         _box(ax, 0.75, cy - 0.42, 3.7, 0.84,
              edgecolor=ACCENT if filled else EDGE,
@@ -443,6 +443,61 @@ def cancellation(path):
     return float(np.linalg.norm(mean))
 
 
+def ubi_document(path):
+    """
+    The schema change, shown as the record itself.
+
+    Built to be valid against UBI's published query schema rather than to look
+    tidy: user_query is required, so it is emptied rather than dropped, and the
+    vector rides in query_attributes, which is typed as a free-form object. The
+    identifiers are identical on both sides on purpose, because they are what the
+    limitations slide has to admit is still in the clear.
+    """
+    fig, ax = plt.subplots(figsize=(10.8, 4.6), dpi=220)
+    fig.subplots_adjust(left=0, right=1, top=1, bottom=0)
+    ax.set_xlim(0.05, 9.95)
+    ax.set_ylim(0.15, 4.15)
+    ax.axis("off")
+    fig.patch.set_facecolor(PAPER)
+
+    shared = ['{',
+              '  "query_id":  "q-8f31c4",',
+              '  "client_id": "c-2f91",',
+              '  "timestamp": "2026-09-24T10:12:03Z",']
+    before = shared + ['  "user_query": "solid wood platform bed"', '}']
+    after = shared + ['  "user_query": "",',
+                      '  "query_attributes": {',
+                      '    "noised_query_vector": [0.03, -1.82, ...],',
+                      '    "epsilon": 1.0',
+                      '  }',
+                      '}']
+
+    rows = [3.35 - 0.30 * i for i in range(10)]
+
+    def panel(x, label, lines, changed, colour):
+        _box(ax, x, 0.45, 4.4, 3.25, edgecolor=EDGE, facecolor=PAPER)
+        ax.text(x + 2.2, 3.90, label, ha="center", va="center",
+                fontsize=12, color=colour, fontweight="bold")
+        for i, line in enumerate(lines):
+            if i in changed:
+                ax.add_patch(FancyBboxPatch(
+                    (x + 0.10, rows[i] - 0.15), 4.20, 0.30,
+                    boxstyle="round,pad=0.0,rounding_size=0.04",
+                    linewidth=0, facecolor=colour, alpha=0.13))
+            ax.text(x + 0.26, rows[i], line, ha="left", va="center",
+                    fontsize=10, family="monospace",
+                    color=colour if i in changed else INK,
+                    fontweight="bold" if i in changed else "normal")
+
+    panel(0.15, "today", before, {4}, WARN)
+    _arrow(ax, (4.75, 2.05), (5.35, 2.05), 0, ACCENT)
+    panel(5.45, "with LDP", after, {4, 5, 6, 7, 8}, ACCENT)
+
+    fig.savefig(path, bbox_inches="tight", pad_inches=0.06, facecolor=PAPER)
+    plt.close(fig)
+    print(f"wrote {path.relative_to(HERE)}")
+
+
 if __name__ == "__main__":
     PLOTS.mkdir(exist_ok=True)
     relevance_loop(PLOTS / "04_relevance_loop.png")
@@ -452,3 +507,4 @@ if __name__ == "__main__":
     epsilon_dial(PLOTS / "13_epsilon_dial.png")
     trust_boundary(PLOTS / "28_trust_boundary.png")
     cancellation(PLOTS / "21_cancellation.png")
+    ubi_document(PLOTS / "28_ubi_document.png")

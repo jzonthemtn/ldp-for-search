@@ -113,7 +113,9 @@ SLIDES = [
         ],
         "accent": WARN,
     }, "Be specific. Legal does not object to 'search data' in the abstract. They object to "
-       "these fields. Naming them makes the rest of the talk concrete."),
+       "these fields. Naming them makes the rest of the talk concrete. Know which half you are "
+       "about to solve: everything after this addresses user_query. The identifiers are dealt "
+       "with on the limitations slide, so do not imply here that they go away too."),
 
     ("bullets", {
         "title": "Redaction is reactive by construction",
@@ -175,10 +177,10 @@ SLIDES = [
      "About 7 minutes. Mechanism briefly, then two verification beats, weakest to strongest."),
 
     ("bullets", {
-        "title": "Local Differential Privacy, in one slide",
+        "title": "Local Differential Privacy",
         "bullets": [
+            "The vector was never the problem, storing it readable was",
             "Add calibrated noise to the query vector on the device",
-            "Noise scale = sensitivity / epsilon",
             "Epsilon is the dial, and lower epsilon means more noise and more privacy",
             "The cluster never receives a readable query, so there is nothing to scrub",
         ],
@@ -190,12 +192,17 @@ SLIDES = [
        "time and it is not the point of the talk. The noise is Laplace, but the word can wait "
        "for the next slide, where the shape is on screen and does the explaining for you. If "
        "someone asks here, one sentence: symmetric noise, equally likely to push the value up "
-       "or down, centred on the truth."),
+       "or down, centered on the truth. The formula is deliberately off the slide. If someone "
+       "asks, the noise scale is sensitivity over epsilon, and sensitivity here is 1.0 per "
+       "coordinate on vectors whose whole norm is 1, which is conservative rather than tight. "
+       "The notes file has the longer answer. Do not volunteer the word, it is the only term in "
+       "the deck with no definition behind it."),
 
     ("image", {
         "title": "Verification 1: the noise is what we claim",
         "path": "08_laplace_tent_audit.png",
-        "caption": "The peak sits on the true value, and the width of the tent is the privacy.",
+        "caption": "A biased mechanism would put the peak off the red line. The width is the "
+                   "privacy.",
     }, "This is the distributional check. It proves the mechanism is implemented correctly. It "
        "does not prove an attacker fails, which is why the next slide exists."),
 
@@ -225,8 +232,6 @@ SLIDES = [
         "title": "That first demo was rigged",
         "bullets": [
             "It ran at epsilon 1.2 on a 20 document index",
-            "Privacy was excellent. Utility was destroyed",
-            "P@1 of 0.07 against a random baseline of 0.05",
             "The attacker learned nothing, and neither did the user",
         ],
         "accent": WARN,
@@ -267,35 +272,36 @@ SLIDES = [
        "privacy tax, it is a trade of individual resolution for population accuracy."),
 
     ("demo", {
-        "title": "Demo: cohorts of real users",
+        "title": "Demo: segments of real users",
         "lines": [
             "Notebook section 11",
-            "480 real WANDS queries, grouped into 5 cohorts",
+            "480 real queries from Wayfair's WANDS dataset, grouped into 5 segments",
             "Every user privatizes independently, on their own device",
         ],
-    }, "Stress that no cohort member sends a readable query, and the server does the aggregation "
-       "on noised vectors only. There is no trusted intermediate step."),
-
-    ("table", {
-        "title": "Individuals hide. The crowd does not.",
-        "columns": ["cohort", "individual", "chance", "cohort ID"],
-        "rows": [
-            ["Wall Art", "0.020", "0.014", "OK"],
-            ["Accent Chairs", "0.020", "0.027", "OK"],
-            ["Beds", "0.063", "0.026", "OK"],
-            ["Area Rugs", "0.070", "0.031", "OK"],
-            ["Coffee & Cocktail Tables", "0.030", "0.025", "OK"],
-        ],
-        "footnote": "epsilon 1.0, heavier noise than anything in Part 4. 20,000 users per cohort. 5 of 5 recovered.",
-    }, "Individual recovery runs at roughly 1x to 2.5x chance, which is not usable. Aggregate "
-       "recovery is exact. Same data, same epsilon, two different questions."),
+    }, "Stress that no one in a segment sends a readable query, and the server does the aggregation "
+       "on noised vectors only. There is no trusted intermediate step. Read the result off the "
+       "notebook rather than a slide, because both halves matter. Individual recovery per segment "
+       "runs 0.020, 0.020, 0.063, 0.070 and 0.030 against chance of 0.014 to 0.031, so roughly "
+       "one to two and a half times chance, which is not usable. Segment identification is "
+       "5 of 5, exact. Same data, same epsilon of 1.0, two different questions."),
 
     ("image", {
-        "title": "Error falls as 1 / sqrt(n), exactly as theory says",
+        "title": "Error falls as 1 / sqrt(users)",
         "path": "11_aggregate_convergence.png",
-        "caption": "Doubling the privacy budget is expensive. Four times the users is free.",
-    }, "The centrepiece. Measured error tracks theory across four orders of magnitude. Point at "
-       "the crossing with the red line, that is the next slide."),
+        "lead": "Average the noised queries of `n` users in one segment, then see how far that "
+                "average lands from the truth.",
+        "caption": "Once the green error line drops under the red line, the privacy noise has "
+                   "become smaller than one coordinate's typical spread.",
+    }, "The centerpiece. Measured error tracks theory across four orders of magnitude. The "
+       "title no longer says this is ordinary statistics, so say it: averaging n independent "
+       "things shrinks the noise as one over root n, the same reason a poll of four thousand "
+       "beats one of one thousand. Nothing here is special to privacy. Point at "
+       "the crossing with the red line, that is the next slide. Spell the crossing out, because "
+       "it is the one thing on this slide that is not self-evident. The red line is not a "
+       "distance. It is the mean per-coordinate standard deviation of the index, 0.128, used as "
+       "a deliberately strict accuracy target. The typical Euclidean distance between two "
+       "products is about 0.82, so this bar is roughly six times stricter than merely telling "
+       "products apart. If asked, say conservative, and do not call it a distance."),
 
     ("bullets", {
         "title": "How big a segment has to be",
@@ -325,14 +331,18 @@ SLIDES = [
     ("bullets", {
         "title": "Where the noise gets injected",
         "bullets": [
-            "In `ubi.js`, on the device, before the event is sent",
-            "The cluster stores noised vectors and never sees the raw query",
+            "On the device, before `ubi.js` sends the event",
             "Aggregation happens at query time over the noised data",
             "Nothing downstream needs to be trusted, because nothing downstream has the original",
-            "You set epsilon in `ubi.js`, so anyone can read the value you shipped",
+            "You set epsilon in the client you ship",
         ],
+        "note": {"lead": "An upcoming UBI RFC will bring this capability into `ubi.js`"},
         "image": {"path": "28_trust_boundary.png"},
-    }, "The architectural payoff. The trust boundary moves to the device, which is the only place "
+    }, "Say up front that none of this is built into UBI today. ubi.js is a serializer, and the "
+       "embedding, the projection and the noise are code the adopter writes and runs before "
+       "handing the request to trackQuery. The notes file has the call shape and the two ways "
+       "to get it wrong. "
+       "The architectural payoff. The trust boundary moves to the device, which is the only place "
        "the raw query legitimately exists. The last bullet answers the obvious objection, that the "
        "people collecting the data are the ones choosing how much privacy users get. True, and the "
        "standing critique of deployed LDP. The web deployment is the answer: because the mechanism "
@@ -340,16 +350,36 @@ SLIDES = [
        "epsilon. A server-side pipeline or a native app cannot make that claim. It turns trust us "
        "into check us, which is the same promise as the rest of the talk."),
 
+    ("image", {
+        "title": "What changes in ubi_queries",
+        "path": "28_ubi_document.png",
+        "note": {"lead": "UBI supports this today through `query_attributes`, and the RFC "
+                         "will make it first-class"},
+    }, "The integration question, answered concretely, and it needs no change to the UBI spec. "
+       "query_attributes is typed as a free-form object for exactly this kind of thing, and "
+       "the epsilon travels with the record so a reader knows the budget it was collected "
+       "under. user_query is emptied rather than dropped because the published schema lists it "
+       "as required. Worth knowing if someone asks: the schema contradicts itself there, since "
+       "the field also carries a comment saying it is not required, for recommendation systems "
+       "with no typed query. Two things to volunteer: the identifiers are deliberately "
+       "identical on both sides, which is the limitation two slides later, and every dashboard "
+       "that reads user_query breaks, which is the real migration cost. A float array in an "
+       "object is not a knn_vector either, so averaging these at query time needs a scripted "
+       "aggregation or an explicit vector mapping."),
+
     ("bullets", {
         "title": "What your dashboards can still compute",
         "bullets": [
             "Aggregate query intent per segment",
             "Demand trends and shifts over time",
-            "Cohort-level training signal for learning-to-rank",
+            "Segment-level training signal for learning-to-rank",
             "What they cannot do is show you one user's session",
         ],
     }, "Tie back to the abstract's promise about LTR and query-intent analysis. Then name the "
-       "thing that genuinely goes away."),
+       "thing that genuinely goes away. If anyone presses on the learning-to-rank bullet, be "
+       "straight: LTR judgments come from clicks, and this mechanism does not touch clicks, so "
+       "that signal survives because it was never protected rather than because LDP preserved "
+       "it. The limitations slide says so."),
 
     ("bullets", {
         "title": "The limitations",
@@ -357,7 +387,7 @@ SLIDES = [
             "The category leaks. Harmless for furniture, maybe not for a medical corpus",
             "Epsilon does not transfer between indexes. It depends on coordinate spread",
             "Low-traffic segments stay unmeasurable",
-            "Clicks are counts, not vectors, and want randomized response instead",
+            "This protects `user_query`, while `ubi_events` still holds clicks and ids in the clear",
         ],
         "accent": WARN,
     }, "Every one of these is a question someone will ask. Answering them first is cheaper than "
@@ -370,7 +400,11 @@ SLIDES = [
        "trade at lower resolution, because they only raise n. The genuinely different answer is "
        "shuffle DP or secure aggregation, which buys far more utility at the same epsilon but "
        "changes the architecture rather than the parameter. Worth adding that tail relevance is "
-       "usually improved by retrieval work rather than behavioural signal anyway."),
+       "usually improved by retrieval work rather than behavioural signal anyway. On the last "
+       "bullet, be direct: this is scoped work, not a finished privacy story for all of UBI. "
+       "The query text is covered. Clicks are counts rather than vectors and want randomized "
+       "response, and client_id and session_id would need rotating or dropping. That is the "
+       "honest answer to the linkability half of the problem raised in Part 1."),
 
     # ---------------- Close ----------------
     ("bullets", {
@@ -495,8 +529,11 @@ def _note_line(slide, note, dark):
     frame = _textbox(slide, Inches(0.9), Inches(6.55), Inches(9.8), Inches(0.55))
     para = frame.paragraphs[0]
     lead = para.add_run()
-    lead.text = note["lead"] + " "
-    _style(lead, 14, color=RGBColor(0x8E, 0x9B, 0xB2) if dark else MUTED)
+    para._p.remove(lead._r)
+    _code_runs(para, note["lead"] + (" " if note.get("url") else ""), 14,
+               RGBColor(0x8E, 0x9B, 0xB2) if dark else MUTED)
+    if not note.get("url"):
+        return
     link = para.add_run()
     link.text = note["text"]
     link.hyperlink.address = note["url"]
@@ -695,9 +732,7 @@ def render_image(prs, d):
     if lead:
         box = _textbox(slide, Inches(0.9), Inches(1.20), Inches(11.5), Inches(0.5))
         box.paragraphs[0].alignment = PP_ALIGN.CENTER
-        rl = box.paragraphs[0].add_run()
-        rl.text = lead
-        _style(rl, 15, color=MUTED)
+        _code_runs(box.paragraphs[0], lead, 15, MUTED)
 
     path = PLOTS / d["path"]
     with Image.open(path) as img:
@@ -719,11 +754,12 @@ def render_image(prs, d):
         width=width, height=height,
     )
 
-    cap = _textbox(slide, Inches(1.45), Inches(6.55), Inches(10.4), Inches(0.7))
-    cap.paragraphs[0].alignment = PP_ALIGN.CENTER
-    rc = cap.paragraphs[0].add_run()
-    rc.text = d["caption"]
-    _style(rc, 16, color=MUTED)
+    if d.get("caption"):
+        cap = _textbox(slide, Inches(1.45), Inches(6.55), Inches(10.4), Inches(0.7))
+        cap.paragraphs[0].alignment = PP_ALIGN.CENTER
+        _code_runs(cap.paragraphs[0], d["caption"], 16, MUTED)
+    if d.get("note"):
+        _note_line(slide, d["note"], dark=False)
     return slide
 
 
@@ -806,6 +842,111 @@ RENDERERS = {
 }
 
 
+
+# Standing material for the notes file, appended after the per-slide notes. This is
+# position rather than delivery: it answers questions that are not about any one slide.
+APPENDIX = """\
+## Appendix: should UBI standardize the vector?
+
+Expect this from the room, given the `ubi_queries` slide. The position:
+
+**File the spec bug now, separately.** `schema/1.3.0/query.request.schema.json` lists
+`user_query` in `required`, while the field's own `$comment` says it is "currently not
+required to support recommendation systems etc that might not have a user generated
+query". Both statements are in 1.2.0 and 1.3.0. That needs an issue, not an RFC, and it
+blocks any privacy-preserving use of the schema.
+
+**Not yet for a top-level vector field.** A bare `query_vector` is not self-describing. A
+consumer also needs the embedding model, the PCA basis (the notebook persists
+`wands_pca.npz` for exactly this reason, and without it the coordinates mean nothing
+across deployments), the sensitivity, and the epsilon. Several shapes are also unsettled:
+one epsilon or per-coordinate budgets, fixed or per-deployment dimensionality, whether
+`ubi_events` gets a parallel treatment. A top-level field has to answer those.
+`query_attributes` lets us defer them, which is what it is for.
+
+**The argument that eventually wins is semantic.** A privatized query is not a query
+modifier, it is a substitute for `user_query`. It is primary content in a different
+representation, and `query_attributes` is documented as filter choices, pagination and
+experiment identifiers. Primary content in the metadata bag is fine for one
+implementation and wrong once there are five.
+
+**So: ship it under `query_attributes`, and put the standardization question to the
+room.** This is an unusually good place to find the second and third implementers, and an
+RFC with three interested parties goes very differently from one with a conference talk
+behind it. If something is opened sooner, scope it to the envelope, a
+`query_representation` object carrying mechanism, model, basis reference, epsilon and the
+vector, rather than a bare vector field. The envelope is the part that has to be agreed
+for anyone else's tooling to read the data.
+
+## Appendix: implementing this in ubi.js
+
+`ubi.js` does not build vectors, but it does not need changing either. It is a thin
+serializer, and `query_attributes` is already a constructor argument
+(`opensearch-project/user-behavior-insights`, `ubi-javascript-collector/ubi.js`):
+
+```js
+const q = new UbiQueryRequest(app, clientId, queryId,
+  "",                                   // user_query emptied
+  "product_id",
+  { noised_query_vector: v, epsilon: 1.0 });
+await ubiClient.trackQuery(q);
+```
+
+The work is a pre-step that produces `v`: embed the query, L2-normalize, project through
+the PCA basis, add Laplace noise. The basis ships to the client too, about 30 KB as
+float32 for 20 x 384. It is public, not a secret.
+
+**Embedding in the browser, two options.** `transformers.js` runs `all-MiniLM-L6-v2` as
+ONNX over WASM or WebGPU, which puts the queries in the same space as the product index,
+at the cost of roughly 23 MB quantized on first load. Or skip the model entirely and hash
+character n-grams into a fixed-width vector, applying the same scheme to products
+server-side. That loses synonym matching but needs no download, and for segment-level
+intent it may be enough.
+
+**Never sample the noise with `Math.random()`.** V8 implements it as xorshift128+, and the
+internal state is recoverable from a handful of outputs. An attacker who predicts the
+stream subtracts the noise exactly and recovers the raw vector, which does not weaken the
+guarantee, it voids it. Use `crypto.getRandomValues()`, then inverse-CDF with
+`u ~ Uniform(-0.5, 0.5)`:
+
+```js
+const noise = -b * Math.sign(u) * Math.log(1 - 2 * Math.abs(u));
+```
+
+Reject `|u| === 0.5` or that returns `-Infinity`.
+
+**Privatize on submit, never per keystroke.** Autocomplete firing on every character
+spends the budget many times over on one intent, and the draws compose, so an attacker
+who averages them recovers the query. This is the practical face of the composition
+question on the Questions slide.
+
+## Appendix: why PCA, and what "coordinate spread" means
+
+No slide mentions PCA, which is deliberate, but it is not optional in the mechanism and it
+is the first thing an implementer will trip over.
+
+**Why reduce dimensions at all.** The encoder emits 384. Laplace noise is added to every
+coordinate independently, so the norm of the noise vector grows as the square root of the
+dimension while the signal does not. Going from 384 to 20 cuts the noise norm by about
+4.4x at the same epsilon, which is the difference between a usable mechanism and one that
+destroys everything. The price is variance: the notebook keeps 41.9% of it at 20
+components.
+
+**The basis has to be fixed and shared.** PCA is fit once on the index vectors and the
+same basis is applied to queries, which is why `download_wands.py` persists
+`wands_pca.npz`. Refit it and every stored vector becomes meaningless, because they no
+longer live in the same space.
+
+**What "coordinate spread" means on the limitations slide.** It is the mean per-coordinate
+standard deviation of the index vectors, `wands_vectors.std(axis=0).mean()`, which is
+0.128 for the 20-dimension WANDS basis. Epsilon only means something relative to that
+number. A different corpus, or the same corpus at a different number of components, gives
+a different spread and therefore a different usable epsilon. That is the whole content of
+"epsilon does not transfer between indexes", and it is also why the toy index in Part 4
+needed epsilon 1.2 while the real one is discussed at 1 to 20.
+"""
+
+
 def _markdown_notes():
     """
     Render the speaker notes as markdown, for presenting from the PDF.
@@ -859,10 +1000,13 @@ def _markdown_notes():
         if d.get("link"):
             out += [f'{d["link"].get("lead", "")} <{d["link"]["url"]}>'.strip(), ""]
         if d.get("note"):
-            out += [f'{d["note"]["lead"]} <{d["note"]["url"]}>', ""]
+            note = d["note"]
+            url = f' <{note["url"]}>' if note.get("url") else ""
+            out += [f'{note["lead"]}{url}', ""]
 
         out += [notes, ""]
 
+    out += ["---", "", APPENDIX]
     return "\n".join(out).rstrip() + "\n"
 
 
