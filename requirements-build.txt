@@ -1,0 +1,12 @@
+# Dependencies for rebuilding the deck and its diagrams:
+#
+#     python build_diagrams.py     # writes plots/
+#     python build_slides.py       # writes the pptx and SPEAKER_NOTES.md
+#
+# The notebook has its own, heavier dependencies in requirements.txt. Producing
+# the PDF additionally needs LibreOffice, which is not a Python package:
+#
+#     soffice --headless --convert-to pdf ldp_for_search_slides.pptx
+python-pptx>=1.0
+Pillow>=10.0
+matplotlib>=3.8
