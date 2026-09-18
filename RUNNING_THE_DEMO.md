@@ -35,7 +35,16 @@ The first notebook run also pulls `all-MiniLM-L6-v2` (~90 MB) into
 
 ## Pre-flight, the morning of
 
-Open the notebook and use **Kernel → Restart Kernel and Run All Cells**. It should
+```bash
+./start_jupyter.sh --check    # verifies the virtualenv and the cached dataset
+./start_jupyter.sh            # launches JupyterLab on the notebook
+```
+
+`start_jupyter.sh` finds whichever virtualenv this checkout has, so you do not have
+to remember whether it is `venv` or `.venv`, and it fails loudly if `data/` is
+incomplete rather than letting you discover it in Part 5.
+
+Then use **Kernel → Restart Kernel and Run All Cells**. It should
 finish in seconds with no errors and every figure drawn. That single check exercises
 the model load, the cached dataset, and every cell you will run live.
 
@@ -44,7 +53,7 @@ Then **Restart Kernel** again so you start the talk from a clean state.
 To confirm you are genuinely offline-safe, launch with the network switched off, or:
 
 ```bash
-HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 jupyter lab ldp_for_search.ipynb
+./start_jupyter.sh --offline
 ```
 
 ## What to run, and when
@@ -102,9 +111,9 @@ above the one that failed.
 needs network to rebuild. Check that `data/` holds `product.csv`, `query.csv`,
 `wands_vectors_pca20.npy`, `wands_products.npz` and `wands_pca.npz`.
 
-**The model tries to reach Hugging Face** — set `HF_HUB_OFFLINE=1` and
-`TRANSFORMERS_OFFLINE=1` before launching, so it uses the local cache and fails fast
-rather than hanging on a bad venue network.
+**The model tries to reach Hugging Face** — relaunch with `./start_jupyter.sh
+--offline`, which pins it to the local cache so it fails fast rather than hanging on
+a bad venue network.
 
 **Wrong interpreter** — section 10a prints the interpreter path it is using. It must
 point inside your virtualenv. If it does not, switch kernels with **Kernel → Change
