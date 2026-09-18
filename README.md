@@ -138,13 +138,13 @@ noised data, while individual recovery stays at roughly chance. The estimation e
 | 10,000 |         0.066 |
 | 100,000 |        0.020 |
 
-The spread of the index itself is 0.128, which the error crosses at roughly 2,500 users. That is
+The spread of the index itself is 0.128, which the error crosses at roughly 2,300 users. That is
 the practical threshold. Segments with thousands of users are measurable under LDP. Segments with
 dozens are not.
 
-That 2,500 is not a constant. It is the crossing at `epsilon = 1.0` on this index, and it moves
+That 2,300 is not a constant. It is the crossing at `epsilon = 1.0` on this index, and it moves
 with the privacy budget: error goes as `(1 / epsilon) / sqrt(n)`, so the threshold scales as
-`1 / epsilon^2`. At `epsilon = 0.5` it is around 10,000 users, at `epsilon = 2` around 625. Like
+`1 / epsilon^2`. At `epsilon = 0.5` it is around 9,200 users, at `epsilon = 2` around 575. Like
 epsilon itself, it does not transfer between indexes, because the yardstick is the coordinate
 spread of the index you are on.
 

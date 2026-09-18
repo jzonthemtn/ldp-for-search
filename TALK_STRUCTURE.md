@@ -164,11 +164,11 @@ Centroid error against population size, cohort `Beds`:
 | 10,000 | 0.066 |
 | 100,000 | 0.020 |
 
-The spread of the index itself is 0.128, which the error crosses at roughly 2,500 users.
+The spread of the index itself is 0.128, which the error crosses at roughly 2,300 users.
 
 That crossing is at `epsilon = 1.0` on this index, not a universal number. Error goes as
-`(1 / epsilon) / sqrt(n)`, so the threshold scales as `1 / epsilon^2`: around 10,000 users at
-`epsilon = 0.5`, around 625 at `epsilon = 2`. Slide 25 states this as "halving epsilon needs four
+`(1 / epsilon) / sqrt(n)`, so the threshold scales as `1 / epsilon^2`: around 9,200 users at
+`epsilon = 0.5`, around 575 at `epsilon = 2`. Slide 25 states this as "halving epsilon needs four
 times the users".
 
 ## Questions to expect

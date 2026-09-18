@@ -53,7 +53,7 @@ HANGING_INDENT = 342900
 SLIDES = [
     ("title", {
         "title": "Leveraging LDP for High-Trust OpenSearch UBI",
-        "subtitle": "Keeping relevance work alive when you cannot store the queries",
+        "subtitle": "Tuning search when you can't store the queries",
         "footer": "Jeff Zemerick",
         "event": "OpenSearchCon NA",
         "date": "September 24, 2026",
@@ -75,13 +75,13 @@ SLIDES = [
        "The UBI maintainership is why the OpenSearch half is credible. Do not read the list."),
 
     # ---------------- Part 1. The blocker ----------------
-    ("section", {"eyebrow": "Part 1", "title": "The blocker"},
+    ("section", {"eyebrow": "Part 1", "title": "The problem"},
      "About 8 minutes. Goal is that everyone understands the problem before any code appears."),
 
     ("bullets", {
-        "title": "To tune search, you have to see what users do",
+        "title": "To tune search you have to see what users do",
         "bullets": [
-            "Relevance work is empirical, not theoretical",
+            "Relevance is measured",
             "Which queries fire, which results get clicked, at which position",
             "Learning-to-rank trains on exactly this signal",
             "Without it you are guessing, and shipping guesses to production",
@@ -105,7 +105,7 @@ SLIDES = [
        "points at three of them specifically."),
 
     ("bullets", {
-        "title": "Then legal reads the schema",
+        "title": "Legal department sees the schema",
         "bullets": [
             "`user_query` is free text a person typed. It can contain anything",
             "`client_id` and `session_id` make it linkable across time",
@@ -171,10 +171,11 @@ SLIDES = [
             "Storing embeddings is not a privacy control",
         ],
         "accent": WARN,
+        "bold": -1,
     }, "This is the result the rest of the talk builds on. Pause here."),
 
     # ---------------- Part 3. Mechanism and verification ----------------
-    ("section", {"eyebrow": "Part 3", "title": "The mechanism, and how to verify it"},
+    ("section", {"eyebrow": "Part 3", "title": "The fix and the proof"},
      "About 7 minutes. Mechanism briefly, then two verification beats, weakest to strongest."),
 
     ("bullets", {
@@ -211,7 +212,10 @@ SLIDES = [
         "title": "Verification 2: measure an actual attacker",
         "path": "10_item_vs_class_recovery.png",
         "caption": "The category leaks well before the item does. At epsilon 1, neither is "
-                   "recoverable.",
+                   "usable.",
+        "note": {"lead": "Data: WANDS, Wayfair product search relevance (ECIR 2022), MIT licensed:",
+                 "text": "github.com/wayfair/WANDS",
+                 "url": "https://github.com/wayfair/WANDS"},
     }, "Stronger evidence than the histogram, because it measures an adversary rather than a "
        "distribution. This discharges the 'verify, do not hope' promise in the abstract. "
        "Head off the obvious confusion: the previous slide used epsilon 1.2 and this axis runs "
@@ -240,7 +244,7 @@ SLIDES = [
        "what makes Part 5 believable."),
 
     ("image", {
-        "title": "At epsilon 1.2, barely better than guessing",
+        "title": "Epsilon 1.2 is barely better than guessing",
         "path": "07_epsilon_tradeoff_toy_index.png",
         "caption": "The red line is where the first demo ran. Utility only comes back where "
                    "the attacker wins too.",
@@ -266,6 +270,7 @@ SLIDES = [
             "It cancels when you average over many independent users",
             "One person's query is unrecoverable",
             "The trend across ten thousand people is not",
+            "That trend is all UBI needs to tune relevance",
         ],
         "image": {"path": "21_cancellation.png"},
         "accent": ACCENT,
@@ -291,23 +296,22 @@ SLIDES = [
         "path": "11_aggregate_convergence.png",
         "lead": "Average the noised queries of `n` users in one segment, then see how far that "
                 "average lands from the truth.",
-        "caption": "Once the green error line drops under the red line, the privacy noise has "
-                   "become smaller than one coordinate's typical spread.",
-    }, "The centerpiece. Measured error tracks theory across four orders of magnitude. The "
-       "title no longer says this is ordinary statistics, so say it: averaging n independent "
-       "things shrinks the noise as one over root n, the same reason a poll of four thousand "
-       "beats one of one thousand. Nothing here is special to privacy. Point at "
-       "the crossing with the red line, that is the next slide. Spell the crossing out, because "
-       "it is the one thing on this slide that is not self-evident. The red line is not a "
-       "distance. It is the mean per-coordinate standard deviation of the index, 0.128, used as "
-       "a deliberately strict accuracy target. The typical Euclidean distance between two "
-       "products is about 0.82, so this bar is roughly six times stricter than merely telling "
-       "products apart. If asked, say conservative, and do not call it a distance."),
+        "caption": "The red line is the smallest segment you can measure.",
+    }, "The centerpiece. Take the shape first. More users, less error. The measured green "
+       "line tracks the predicted grey one across four orders of magnitude. This is ordinary "
+       "statistics, so say so: averaging n independent things shrinks the noise as one over "
+       "root n, the same reason a poll of four thousand beats one of one thousand. Nothing "
+       "here is special to privacy. Then the red line. Read it off the bottom axis: 2,300 "
+       "users. That is the answer, and it is the next slide. If asked where 2,300 comes from, "
+       "it is where the measured error drops under 0.128, the average spread of one "
+       "coordinate across the index. That bar is strict on purpose. Two typical products sit "
+       "about 0.82 apart, so the line is roughly six times stricter than just telling "
+       "products apart."),
 
     ("bullets", {
         "title": "How big a segment has to be",
         "bullets": [
-            "Error drops below the spread of the index at roughly 2,500 users",
+            "Error drops below the spread of the index at roughly 2,300 users",
             "That is at epsilon 1, and halving epsilon needs four times the users",
             "Segments with thousands of users are measurable under LDP",
             "Segments with dozens are not measurable",
@@ -315,10 +319,10 @@ SLIDES = [
         ],
         "accent": ACCENT,
     }, "Give the audience one operational number they can apply on Monday. This is it. The "
-       "2,500 is where the measured error crosses the spread of the index, 0.128, on the "
+       "2,300 is where the measured error crosses the spread of the index, 0.128, on the "
        "convergence plot. It is not a constant: error goes as one over epsilon times one over "
        "root n, so the threshold scales as one over epsilon squared. At epsilon 0.5 it is "
-       "10,000 users, at epsilon 2 it is about 625."),
+       "about 9,200 users, at epsilon 2 it is about 575."),
 
     ("statement", {
         "text": "LDP does not cost you your analytics.\nIt costs you the ability to ask about one person.",
@@ -326,7 +330,7 @@ SLIDES = [
        "this sit on screen for a beat before moving on."),
 
     # ---------------- Part 6. Back to OpenSearch ----------------
-    ("section", {"eyebrow": "Part 6", "title": "Back to OpenSearch, and the limits"},
+    ("section", {"eyebrow": "Part 6", "title": "Back in OpenSearch"},
      "About 7 minutes. Land the integration, then be honest about what does not work."),
 
     ("bullets", {
@@ -355,7 +359,7 @@ SLIDES = [
         "title": "What changes in ubi_queries",
         "path": "28_ubi_document.png",
         "note": {"lead": "UBI supports this today through `query_attributes`, and the RFC "
-                         "will make it first-class"},
+                         "will propose making it first-class"},
     }, "The integration question, answered concretely, and it needs no change to the UBI spec. "
        "query_attributes is typed as a free-form object for exactly this kind of thing, and "
        "the epsilon travels with the record so a reader knows the budget it was collected "
@@ -385,10 +389,10 @@ SLIDES = [
     ("bullets", {
         "title": "The limitations",
         "bullets": [
-            "The category leaks. Harmless for furniture, maybe not for a medical corpus",
-            "Epsilon does not transfer between indexes. It depends on coordinate spread",
+            "The category leaks and that is worse for medicine than furniture",
+            "What a given epsilon buys you depends on coordinate spread so it does not transfer between indexes",
             "Low-traffic segments stay unmeasurable",
-            "This protects `user_query`, while `ubi_events` still holds clicks and ids in the clear",
+            "This protects `user_query` but `ubi_events` still holds clicks and ids in the clear",
         ],
         "accent": WARN,
     }, "Every one of these is a question someone will ask. Answering them first is cheaper than "
@@ -396,7 +400,16 @@ SLIDES = [
        "sensitivity calibrated to the true coordinate range. Here the vectors are "
        "L2-normalized before PCA, so the whole 20-dimensional vector has norm 1, which makes "
        "sensitivity 1.0 per coordinate conservative rather than tight. That is the answer if "
-       "someone asks how sensitivity was set. On the long tail, which someone will ask about: "
+       "someone asks how sensitivity was set. Two follow-ups come off that bullet. Asked how "
+       "often epsilon needs re-tuning, say when you re-embed or refit PCA, because routine "
+       "additions to a large index do not move the coordinate spread, and normalizing before "
+       "PCA keeps sensitivity itself stable whatever the catalogue holds. Asked whether "
+       "privacy decays over time, say yes but not through epsilon: one user's repeated "
+       "queries compose, and an attacker who averages that one user's own noised draws "
+       "recovers the intent, which is the asymmetry from Part 5 turned around. Epsilon is a "
+       "budget per release rather than a standing property, so the fix is rotating or "
+       "dropping client_id and session_id, not a smaller epsilon. On the long tail, which "
+       "someone will ask about: "
        "the workarounds are coarser segments and longer time windows, and both are the same "
        "trade at lower resolution, because they only raise n. The genuinely different answer is "
        "shuffle DP or secure aggregation, which buys far more utility at the same epsilon but "
@@ -412,7 +425,7 @@ SLIDES = [
         "title": "Takeaways",
         "bullets": [
             "Storing embeddings instead of text is not privacy",
-            "Noise at the source beats scrubbing after the fact",
+            "Keeping sensitive data out of the index beats redacting it later",
             "Verify the mechanism by attacking it, not by trusting it",
             "You trade individual resolution for population accuracy, and relevance only needs the latter",
         ],
@@ -452,7 +465,7 @@ def _style(run, size, bold=False, color=INK, font=BODY_FONT):
     run.font.name = font
 
 
-def _code_runs(paragraph, text, size, color):
+def _code_runs(paragraph, text, size, color, bold=False):
     """
     Add `text` to a paragraph, rendering `backticked` spans in the mono face.
 
@@ -466,7 +479,7 @@ def _code_runs(paragraph, text, size, color):
         run = paragraph.add_run()
         run.text = part
         code = i % 2 == 1
-        _style(run, size - 2 if code else size, color=color,
+        _style(run, size - 2 if code else size, bold=bold, color=color,
                font=MONO_FONT if code else BODY_FONT)
 
 
@@ -527,10 +540,17 @@ def _retheme_links(prs, rgb=LINK_THEME):
     part._blob = xml.encode("utf-8")
 
 
-def _note_line(slide, note, dark):
-    """An aside along the bottom of a slide, for a pointer that would derail the body."""
-    frame = _textbox(slide, Inches(0.9), Inches(6.55), Inches(9.8), Inches(0.55))
+def _note_line(slide, note, dark, top=None, center=False):
+    """An aside along the bottom of a slide, for a pointer that would derail the body.
+
+    A chart slide already spends the bottom band on its caption, so `top` and
+    `center` let the note tuck underneath it and line up with it.
+    """
+    left, width = (Inches(1.45), Inches(10.4)) if center else (Inches(0.9), Inches(9.8))
+    frame = _textbox(slide, left, Inches(6.55) if top is None else top, width, Inches(0.55))
     para = frame.paragraphs[0]
+    if center:
+        para.alignment = PP_ALIGN.CENTER
     lead = para.add_run()
     para._p.remove(lead._r)
     _code_runs(para, note["lead"] + (" " if note.get("url") else ""), 14,
@@ -677,6 +697,10 @@ def render_bullets(prs, d):
     emphasized = d.get("emphasize")
     if emphasized is not None:
         emphasized %= len(d["bullets"])
+    # Same addressing, for a bullet that wants weight rather than colour.
+    bolded = d.get("bold")
+    if bolded is not None:
+        bolded %= len(d["bullets"])
 
     for i, text in enumerate(d["bullets"]):
         p = body.paragraphs[0] if i == 0 else body.add_paragraph()
@@ -691,7 +715,7 @@ def render_bullets(prs, d):
         dot = p.add_run()
         dot.text = "-   "
         _style(dot, size, bold=True, color=accent)
-        _code_runs(p, text, size, accent if i == emphasized else INK)
+        _code_runs(p, text, size, accent if i == emphasized else INK, bold=i == bolded)
 
     link = d.get("link")
     if link:
@@ -783,7 +807,9 @@ def render_image(prs, d):
         cap.paragraphs[0].alignment = PP_ALIGN.CENTER
         _code_runs(cap.paragraphs[0], d["caption"], 16, MUTED)
     if d.get("note"):
-        _note_line(slide, d["note"], dark=False)
+        caption = bool(d.get("caption"))
+        _note_line(slide, d["note"], dark=False,
+                   top=Inches(6.95) if caption else None, center=caption)
     return slide
 
 
