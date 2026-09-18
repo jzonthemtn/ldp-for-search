@@ -112,7 +112,7 @@ Say the objection out loud in the audience's voice before you refute it. If you 
 
 - Notebook sections 1 to 6, then section 9
 
-Read the 20 documents aloud. They fit in one breath. Then run section 9 and let the raw result speak. Do not rush this, it is the hinge of the talk.
+Read the 20 documents aloud. They fit in one breath. Then run section 9 and let the raw result speak. Do not rush this, it is the hinge of the talk. Before you leave the notebook, run section 10a as well. It only loads the cached dataset, and having it already in the kernel is what keeps the Part 5 demo instant.
 
 ---
 
@@ -217,11 +217,11 @@ This is the conceptual core of the talk. Everything before it was setup. LDP is 
 
 ## 21. Demo: segments of real users
 
-- Notebook section 11
+- Notebook sections 10a and 11
 - 480 real queries from Wayfair's WANDS dataset, grouped into 5 segments
 - Every user privatizes independently, on their own device
 
-Stress that no one in a segment sends a readable query, and the server does the aggregation on noised vectors only. There is no trusted intermediate step. Read the result off the notebook rather than a slide, because both halves matter. Individual recovery per segment runs 0.020, 0.020, 0.063, 0.070 and 0.030 against chance of 0.014 to 0.031, so roughly one to two and a half times chance, which is not usable. Segment identification is 5 of 5, exact. Same data, same epsilon of 1.0, two different questions.
+Section 10a only loads the cached WANDS data, and section 11 raises a NameError without it, so run it first if you did not already run it back in Part 2. Stress that no one in a segment sends a readable query, and the server does the aggregation on noised vectors only. There is no trusted intermediate step. Read the result off the notebook rather than a slide, because both halves matter. Individual recovery per segment runs 0.020, 0.020, 0.063, 0.070 and 0.030 against chance of 0.014 to 0.031, so roughly one to two and a half times chance, which is not usable. Segment identification is 5 of 5, exact. Same data, same epsilon of 1.0, two different questions.
 
 ---
 
