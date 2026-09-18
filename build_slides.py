@@ -25,6 +25,7 @@ HERE = Path(__file__).parent
 PLOTS = HERE / "plots"
 OUTPUT = HERE / "ldp_for_search_slides.pptx"
 NOTES_OUTPUT = HERE / "SPEAKER_NOTES.md"
+FEEDBACK_QR = HERE / "leveraging-ldp-for-high-trust-opensearch-ubi_zemerick_1212636_feedback-code.png"
 
 # 16:9
 SLIDE_W = Inches(13.333)
@@ -425,6 +426,8 @@ SLIDES = [
         "footer": "Jeff Zemerick",
         "event": "OpenSearchCon NA",
         "date": "September 24, 2026",
+        "qr": FEEDBACK_QR,
+        "qr_label": "Session feedback",
     }, "Have the notebook open on the convergence plot behind you during Q&A. Likely questions: "
        "formal DP guarantee, why PCA, composition across repeated queries from one user, why not "
        "just hash the query."),
@@ -592,6 +595,27 @@ def render_title(prs, d):
         run = p.add_run()
         run.text = line
         _style(run, 15, color=RGBColor(0x7C, 0x88, 0x9E))
+
+    # Optional QR in the right margin, e.g. the session feedback code on the
+    # closing slide. The white pad behind it keeps a quiet zone against the band.
+    qr = d.get("qr")
+    if qr:
+        side = Inches(2.7)
+        pad = Inches(0.14)
+        left = SLIDE_W - Inches(0.9) - side
+        top = Inches(2.3)
+        card = slide.shapes.add_shape(1, left - pad, top - pad, side + 2 * pad, side + 2 * pad)
+        card.fill.solid()
+        card.fill.fore_color.rgb = PAPER
+        card.line.fill.background()
+        card.shadow.inherit = False
+        slide.shapes.add_picture(str(qr), left, top, width=side, height=side)
+
+        label = _textbox(slide, left - pad, top + side + pad + Inches(0.12), side + 2 * pad, Inches(0.4))
+        label.paragraphs[0].alignment = PP_ALIGN.CENTER
+        rl = label.paragraphs[0].add_run()
+        rl.text = d.get("qr_label", "Session feedback")
+        _style(rl, 14, color=RGBColor(0x8E, 0xB8, 0xE8))
     return slide
 
 
