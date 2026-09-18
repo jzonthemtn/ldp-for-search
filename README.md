@@ -164,5 +164,7 @@ run-to-run variation that the noise actually produces.
 ## Files
 
 - `ldp_for_search.ipynb` is the notebook.
+- `RUNNING_THE_DEMO.md` is the runbook for presenting: run order, timings, and what
+  to do when a cell fails in front of a room.
 - `download_wands.py` fetches and caches the WANDS dataset and its embeddings.
 - `data/` holds the cached dataset and vectors. It is gitignored.
