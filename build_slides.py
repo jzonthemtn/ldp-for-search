@@ -63,7 +63,7 @@ SLIDES = [
     ("bullets", {
         "title": "About me",
         "bullets": [
-            "Independent consultant, Mountain Fog",
+            "Independent consultant at Mountain Fog",
             "OpenSearch UBI and opensearch-migrations maintainer",
             "Apache Software Foundation member, OpenNLP PMC Chair",
             "PII redaction tooling at Philterd",
@@ -105,12 +105,12 @@ SLIDES = [
        "points at three of them specifically."),
 
     ("bullets", {
-        "title": "Legal department sees the schema",
+        "title": "Legal rules won't let us see the user queries",
         "bullets": [
-            "`user_query` is free text a person typed. It can contain anything",
+            "`user_query` is free text and can contain *anything*",
+            "Telling users not to enter PII or PHI does not stop them",
             "`client_id` and `session_id` make it linkable across time",
-            "In healthcare and finance, that combination is a hard stop",
-            "Zero-trust stopped being a buzzword and became a blocker to relevance tuning",
+            "Zero-trust becomes a blocker to relevance tuning",
         ],
         "accent": WARN,
     }, "Be specific. Legal does not object to 'search data' in the abstract. They object to "
@@ -119,10 +119,10 @@ SLIDES = [
        "with on the limitations slide, so do not imply here that they go away too."),
 
     ("bullets", {
-        "title": "Redaction is reactive by construction",
+        "title": "Redaction is reactive and sometimes too late",
         "bullets": [
             "You collect the PII first, then try to remove it",
-            "You discover the failure after the fact, if at all",
+            "Leaked PII is discovered later",
             "A free-text query has no schema to redact against",
             "The fix has to be that the sensitive value never leaves the device readable",
         ],
@@ -143,8 +143,8 @@ SLIDES = [
         "title": "The obvious first idea",
         "bullets": [
             "\"We will not store the text. We will store the embedding.\"",
-            "It feels private. It is a vector of floats, not words",
-            "It is not private. It is a lossy encoding",
+            "It's numbers, not words",
+            "It is not private, just a lossy encoding",
             "Vector inversion recovers the intent",
         ],
         "image": {"path": "09_vector_inversion.png"},
@@ -154,22 +154,34 @@ SLIDES = [
     }, "Say the objection out loud in the audience's voice before you refute it. If you skip "
        "this, a good chunk of the room thinks the problem is already solved."),
 
-    ("demo", {
-        "title": "Demo: invert a raw query vector",
-        "lines": [
-            "Notebook sections 1 to 6, then section 9",
+    ("table", {
+        "title": "The same attack on both vectors",
+        "lead": "The attacker looks up the nearest documents to whatever vector they intercepted",
+        "columns": ["Attacker intercepts", "Their best guess", "Distance"],
+        "rows": [
+            ["The raw vector", "Laptop", "0.2092"],
+            ["The noised vector", "Gaming Console", "4.8870"],
         ],
-    }, "Read the 20 documents aloud. They fit in one breath. Then run section 9 and let the raw "
-       "result speak. Do not rush this, it is the hinge of the talk. Before you leave the "
-       "notebook, run section 10a as well. It only loads the cached dataset, and having it "
-       "already in the kernel is what keeps the Part 5 demo instant."),
+        "footnote": "Query \"laptop computer\" at epsilon 1.2, from notebook section 9",
+    }, "Notebook section 9, run beforehand rather than live. Read the 20 documents aloud first, "
+       "they fit in one breath, so the room can hold the whole index in their heads. Then let "
+       "the top row speak: the raw vector hands over the intent. Do not rush this, it is the "
+       "hinge of the talk. The distance column is the part people miss, so point at it. The "
+       "noised vector is not merely wrong, it is 4.9 away from everything, so which document "
+       "wins is close to arbitrary. The number to have ready if someone wants it: its top "
+       "five candidates all sit within 0.15 of each other, while real documents in this index "
+       "are at least 0.89 apart, so the ranking is a tie rather than a wrong answer. "
+       "Two things to be straight about if asked. This is a "
+       "nearest-neighbour lookup against the index rather than literal text inversion, which "
+       "is a weaker attacker than the Morris paper on the previous slide assumes, and it still "
+       "succeeds. And epsilon 1.2 is the rigged setting Part 4 comes back and confesses to."),
 
     ("bullets", {
         "title": "The raw vector gives up the intent",
         "bullets": [
             "Query: \"laptop computer\"",
             "Attacker inverts the raw vector, top hit: Laptop",
-            "No text was stored, and the intent leaked anyway",
+            "Intent was leaked even though no text was stored",
             "Storing embeddings is not a privacy control",
         ],
         "accent": WARN,
@@ -186,7 +198,7 @@ SLIDES = [
             "The vector was never the problem, storing it readable was",
             "Add calibrated noise to the query vector on the device",
             "Epsilon is the dial, and lower epsilon means more noise and more privacy",
-            "The cluster never receives a readable query, so there is nothing to scrub",
+            "The user's query is not stored so there is nothing to redact",
         ],
         "image": {"path": "13_epsilon_dial.png"},
         "note": {"lead": "More on local differential privacy:",
@@ -205,8 +217,8 @@ SLIDES = [
     ("image", {
         "title": "Verification 1: the noise is what we claim",
         "path": "08_laplace_tent_audit.png",
-        "caption": "A biased mechanism would put the peak off the red line. The width is the "
-                   "privacy.",
+        "caption": "A biased mechanism would put the peak off the red line, and the width is "
+                   "the privacy.",
     }, "This is the distributional check. It proves the mechanism is implemented correctly. It "
        "does not prove an attacker fails, which is why the next slide exists."),
 
@@ -282,12 +294,14 @@ SLIDES = [
     ("demo", {
         "title": "Demo: segments of real users",
         "lines": [
-            "Notebook sections 10a and 11",
+            "Notebook section 11",
             "480 real queries from Wayfair's WANDS dataset, grouped into 5 segments",
             "Every user privatizes independently, on their own device",
         ],
-    }, "Section 10a only loads the cached WANDS data, and section 11 raises a NameError "
-       "without it, so run it first if you did not already run it back in Part 2. "
+    }, "This is the only live notebook moment in the talk, so have the kernel primed before "
+       "you walk on: run sections 1 and 2 for the model, then 10a for the cached data. Section "
+       "11 raises a NameError without 10a. If the kernel died, those three take about five "
+       "seconds. "
        "Stress that no one in a segment sends a readable query, and the server does the aggregation "
        "on noised vectors only. There is no trusted intermediate step. Read the result off the "
        "notebook rather than a slide, because both halves matter. Individual recovery per segment "
@@ -471,20 +485,29 @@ def _style(run, size, bold=False, color=INK, font=BODY_FONT):
 
 def _code_runs(paragraph, text, size, color, bold=False):
     """
-    Add `text` to a paragraph, rendering `backticked` spans in the mono face.
+    Add `text` to a paragraph, rendering `backticked` spans in the mono face and
+    *starred* spans in italics.
 
     Field names are the subject of several slides, so they read as identifiers
     rather than prose. Mono runs drop a point, because the face runs wider than
-    Helvetica and an unadjusted span pushes the line into an extra wrap.
+    Helvetica and an unadjusted span pushes the line into an extra wrap. Both
+    markers survive into the speaker notes, where markdown reads them the same way.
     """
     for i, part in enumerate(text.split("`")):
         if not part:
             continue
-        run = paragraph.add_run()
-        run.text = part
-        code = i % 2 == 1
-        _style(run, size - 2 if code else size, bold=bold, color=color,
-               font=MONO_FONT if code else BODY_FONT)
+        if i % 2 == 1:
+            run = paragraph.add_run()
+            run.text = part
+            _style(run, size - 2, bold=bold, color=color, font=MONO_FONT)
+            continue
+        for j, span in enumerate(part.split("*")):
+            if not span:
+                continue
+            run = paragraph.add_run()
+            run.text = span
+            _style(run, size, bold=bold, color=color, font=BODY_FONT)
+            run.font.italic = j % 2 == 1
 
 
 def _fill(slide, color):
@@ -864,11 +887,20 @@ def render_table(prs, d):
             cell.fill.fore_color.rgb = (
                 RGBColor(0xF4, 0xF7, 0xFB) if rix % 2 else PAPER)
 
-    note = _textbox(slide, Inches(0.9), Inches(6.5), Inches(11.5), Inches(0.7))
-    note.paragraphs[0].alignment = PP_ALIGN.CENTER
-    rn = note.paragraphs[0].add_run()
-    rn.text = d["footnote"]
-    _style(rn, 15, color=MUTED)
+    if d.get("body"):
+        top = table_top + 0.62 * (len(rows) + 1) + 0.38
+        box = _textbox(slide, Inches(1.65), Inches(top), Inches(10.0), Inches(1.9))
+        for i, line in enumerate(d["body"]):
+            para = box.paragraphs[0] if i == 0 else box.add_paragraph()
+            para.space_after = Pt(8)
+            _code_runs(para, line, 18, INK)
+
+    if d.get("footnote"):
+        note = _textbox(slide, Inches(0.9), Inches(6.5), Inches(11.5), Inches(0.7))
+        note.paragraphs[0].alignment = PP_ALIGN.CENTER
+        rn = note.paragraphs[0].add_run()
+        rn.text = d["footnote"]
+        _style(rn, 15, color=MUTED)
     return slide
 
 
@@ -1042,6 +1074,9 @@ def _markdown_notes():
             for row in d["rows"]:
                 out.append("| " + " | ".join(row) + " |")
             out.append("")
+
+        for line in d.get("body", []):
+            out += [line, ""]
 
         if d.get("path"):
             out += [f'![{d.get("caption", "")}](plots/{d["path"]})', ""]

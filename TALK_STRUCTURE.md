@@ -52,16 +52,15 @@ Close on why scrubbing is the wrong shape of solution: you collected the PII fir
 only discover a failure after the fact. The alternative is that the sensitive value never
 leaves the device readable.
 
-### Part 2. Embeddings are not anonymization (notebook, 5 min)
-
-Run sections 1 through 6, then section 9.
+### Part 2. Embeddings are not anonymization (slides, 5 min)
 
 This kills the objection half the room is already forming, "we will just store the embedding
-instead of the text". Section 9 inverts the raw query vector cleanly back to `Laptop`. An
-embedding is a lossy encoding, not a privacy control.
+instead of the text". Section 9's result is on a slide: the raw query vector inverts cleanly
+back to `Laptop`, while the noised one lands 4.9 away on `Gaming Console`. An embedding is a
+lossy encoding, not a privacy control.
 
 Read the 20 documents aloud. They fit in one breath, so the audience holds the whole index in
-their head and the next result lands without any metric.
+their head and the result lands without any metric.
 
 ### Part 3. The fix and the proof (slides plus notebook, 7 min)
 
@@ -195,9 +194,9 @@ vocabulary, and it destroys the semantic structure that makes aggregation useful
 
 Full runbook in [RUNNING_THE_DEMO.md](RUNNING_THE_DEMO.md). The essentials:
 
-- Run everything once before walking on stage, then restart the kernel and run live. The whole
-  demo path takes about seven seconds.
-- Section 11 needs section 10a. Run 10a in Part 2 while the notebook is already open.
+- Section 11 in Part 5 is the only live notebook moment. Prime the kernel before you walk on:
+  sections 1 and 2 for the model, then 10a for the cached data, about five seconds in total.
+- Section 11 raises a NameError without 10a.
 - `plots/` is in the deck as backup images, so a dead kernel costs you nothing visible.
 - Verify offline with the wifi off. The model and the WANDS cache are both local after the
   first run.

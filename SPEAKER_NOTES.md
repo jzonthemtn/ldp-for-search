@@ -15,7 +15,7 @@ Open by naming the tension. We need behavioural data to tune relevance, and we a
 
 ## 2. About me
 
-- Independent consultant, Mountain Fog
+- Independent consultant at Mountain Fog
 - OpenSearch UBI and opensearch-migrations maintainer
 - Apache Software Foundation member, OpenNLP PMC Chair
 - PII redaction tooling at Philterd
@@ -61,21 +61,21 @@ Keep this factual and quick. The audience needs the field names because the next
 
 ---
 
-## 6. Legal department sees the schema
+## 6. Legal rules won't let us see the user queries
 
-- `user_query` is free text a person typed. It can contain anything
+- `user_query` is free text and can contain *anything*
+- Telling users not to enter PII or PHI does not stop them
 - `client_id` and `session_id` make it linkable across time
-- In healthcare and finance, that combination is a hard stop
-- Zero-trust stopped being a buzzword and became a blocker to relevance tuning
+- Zero-trust becomes a blocker to relevance tuning
 
 Be specific. Legal does not object to 'search data' in the abstract. They object to these fields. Naming them makes the rest of the talk concrete. Know which half you are about to solve: everything after this addresses user_query. The identifiers are dealt with on the limitations slide, so do not imply here that they go away too.
 
 ---
 
-## 7. Redaction is reactive by construction
+## 7. Redaction is reactive and sometimes too late
 
 - You collect the PII first, then try to remove it
-- You discover the failure after the fact, if at all
+- Leaked PII is discovered later
 - A free-text query has no schema to redact against
 - The fix has to be that the sensitive value never leaves the device readable
 
@@ -96,8 +96,8 @@ About 5 minutes. This exists to kill the objection half the room is already form
 ## 9. The obvious first idea
 
 - "We will not store the text. We will store the embedding."
-- It feels private. It is a vector of floats, not words
-- It is not private. It is a lossy encoding
+- It's numbers, not words
+- It is not private, just a lossy encoding
 - Vector inversion recovers the intent
 
 ![](plots/09_vector_inversion.png)
@@ -108,11 +108,18 @@ Say the objection out loud in the audience's voice before you refute it. If you 
 
 ---
 
-## 10. Demo: invert a raw query vector
+## 10. The same attack on both vectors
 
-- Notebook sections 1 to 6, then section 9
+*The attacker looks up the nearest documents to whatever vector they intercepted*
 
-Read the 20 documents aloud. They fit in one breath. Then run section 9 and let the raw result speak. Do not rush this, it is the hinge of the talk. Before you leave the notebook, run section 10a as well. It only loads the cached dataset, and having it already in the kernel is what keeps the Part 5 demo instant.
+| Attacker intercepts | Their best guess | Distance |
+|---|---|---|
+| The raw vector | Laptop | 0.2092 |
+| The noised vector | Gaming Console | 4.8870 |
+
+*Query "laptop computer" at epsilon 1.2, from notebook section 9*
+
+Notebook section 9, run beforehand rather than live. Read the 20 documents aloud first, they fit in one breath, so the room can hold the whole index in their heads. Then let the top row speak: the raw vector hands over the intent. Do not rush this, it is the hinge of the talk. The distance column is the part people miss, so point at it. The noised vector is not merely wrong, it is 4.9 away from everything, so which document wins is close to arbitrary. The number to have ready if someone wants it: its top five candidates all sit within 0.15 of each other, while real documents in this index are at least 0.89 apart, so the ranking is a tie rather than a wrong answer. Two things to be straight about if asked. This is a nearest-neighbour lookup against the index rather than literal text inversion, which is a weaker attacker than the Morris paper on the previous slide assumes, and it still succeeds. And epsilon 1.2 is the rigged setting Part 4 comes back and confesses to.
 
 ---
 
@@ -120,7 +127,7 @@ Read the 20 documents aloud. They fit in one breath. Then run section 9 and let 
 
 - Query: "laptop computer"
 - Attacker inverts the raw vector, top hit: Laptop
-- No text was stored, and the intent leaked anyway
+- Intent was leaked even though no text was stored
 - Storing embeddings is not a privacy control
 
 This is the result the rest of the talk builds on. Pause here.
@@ -138,7 +145,7 @@ About 7 minutes. Mechanism briefly, then two verification beats, weakest to stro
 - The vector was never the problem, storing it readable was
 - Add calibrated noise to the query vector on the device
 - Epsilon is the dial, and lower epsilon means more noise and more privacy
-- The cluster never receives a readable query, so there is nothing to scrub
+- The user's query is not stored so there is nothing to redact
 
 ![](plots/13_epsilon_dial.png)
 
@@ -150,9 +157,9 @@ One slide only. Resist the urge to teach differential privacy properly, there is
 
 ## 14. Verification 1: the noise is what we claim
 
-![A biased mechanism would put the peak off the red line. The width is the privacy.](plots/08_laplace_tent_audit.png)
+![A biased mechanism would put the peak off the red line, and the width is the privacy.](plots/08_laplace_tent_audit.png)
 
-*A biased mechanism would put the peak off the red line. The width is the privacy.*
+*A biased mechanism would put the peak off the red line, and the width is the privacy.*
 
 This is the distributional check. It proves the mechanism is implemented correctly. It does not prove an attacker fails, which is why the next slide exists.
 
@@ -217,11 +224,11 @@ This is the conceptual core of the talk. Everything before it was setup. LDP is 
 
 ## 21. Demo: segments of real users
 
-- Notebook sections 10a and 11
+- Notebook section 11
 - 480 real queries from Wayfair's WANDS dataset, grouped into 5 segments
 - Every user privatizes independently, on their own device
 
-Section 10a only loads the cached WANDS data, and section 11 raises a NameError without it, so run it first if you did not already run it back in Part 2. Stress that no one in a segment sends a readable query, and the server does the aggregation on noised vectors only. There is no trusted intermediate step. Read the result off the notebook rather than a slide, because both halves matter. Individual recovery per segment runs 0.020, 0.020, 0.063, 0.070 and 0.030 against chance of 0.014 to 0.031, so roughly one to two and a half times chance, which is not usable. Segment identification is 5 of 5, exact. Same data, same epsilon of 1.0, two different questions.
+This is the only live notebook moment in the talk, so have the kernel primed before you walk on: run sections 1 and 2 for the model, then 10a for the cached data. Section 11 raises a NameError without 10a. If the kernel died, those three take about five seconds. Stress that no one in a segment sends a readable query, and the server does the aggregation on noised vectors only. There is no trusted intermediate step. Read the result off the notebook rather than a slide, because both halves matter. Individual recovery per segment runs 0.020, 0.020, 0.063, 0.070 and 0.030 against chance of 0.014 to 0.031, so roughly one to two and a half times chance, which is not usable. Segment identification is 5 of 5, exact. Same data, same epsilon of 1.0, two different questions.
 
 ---
 

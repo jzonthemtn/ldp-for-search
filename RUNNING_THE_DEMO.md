@@ -8,7 +8,8 @@ what to do when something misbehaves in front of a room.
 
 | | |
 |---|---|
-| Run order | sections **1–6**, then **9**, then **10a**, then **11** |
+| Prime before the talk | sections **1**, **2**, **10a** |
+| Live on stage | section **11**, at slide 21 |
 | Total run time | about **7 seconds** |
 | Network needed | **no**, once the one-time prep below is done |
 
@@ -58,50 +59,46 @@ To confirm you are genuinely offline-safe, launch with the network switched off,
 
 ## What to run, and when
 
-Two slides send you to the notebook.
+Only one slide sends you to the notebook now. Part 2's attack result is on slide 10
+as a table, taken from section 9 rather than run live.
 
-### Slide 10 — "Demo: invert a raw query vector"
+### Before you walk on — sections 1, 2 and 10a
 
-Run **sections 1 through 6**, then **section 9**.
-
-Section 1 loads the model and takes about two seconds; everything after it is
-instant. Section 9 is the hinge — the attacker inverting the raw vector.
-
-**Also run section 10a before you leave the notebook.** It only loads the cached
-WANDS data and prints `already cached`, but having it in the kernel is what makes the
-Part 5 demo instant instead of a pause on stage.
+Section 1 loads the model (about two seconds), section 2 sets up the toy index, and
+section 10a loads the cached WANDS data. Together about five seconds. This leaves the
+kernel holding everything section 11 needs, so Part 5 starts instantly.
 
 ### Slide 21 — "Demo: segments of real users"
 
-Run **section 10a** (if you skipped it earlier, or the kernel has restarted), then
-**section 11**.
+Run **section 11**.
 
-Section 11 will **not** run on its own. It needs `DATA_DIR`, `wands_vectors` and the
-PCA basis, all of which section 10a defines. Skipping it gives you:
+It will **not** run on a cold kernel. It needs `DATA_DIR`, `wands_vectors` and the PCA
+basis from section 10a, and `embedding_model` from section 1. A cold start gives you:
 
 ```
 NameError: name 'DATA_DIR' is not defined
 ```
 
-You do not need sections 10b or 10c live — those produce the charts that are already
-on slides 15 and 18 as images.
+If that happens, run sections 1, 2 and 10a and carry on. You do not need sections 7, 8,
+9, 10b or 10c live — all of those are already slides.
 
 ## Section-to-cell map
 
 | Section | What it does | Needed live |
 |---|---|---|
 | 1 | Load the embedding model | yes |
-| 2–6 | Toy index, the LDP engine, query embeddings, k-NN | yes |
+| 2 | Toy index and the imports section 11 uses | yes |
+| 3–6 | The LDP engine, query embeddings, k-NN | no |
 | 7–8 | Epsilon sweep and the Laplace audit plot | no, slides 14 and 18 |
-| 9 | Raw vector inversion, the privacy failure | yes |
+| 9 | Raw vector inversion, the privacy failure | no, slide 10 |
 | 10a | Fetch and cache WANDS, define the shared names | **yes** |
 | 10b–10c | Attack at scale, item vs class recovery | no, slide 15 |
 | 11 | Segments, individual vs crowd, convergence | yes |
 
 ## If something goes wrong
 
-**`NameError: name 'DATA_DIR' is not defined`** — you skipped section 10a. Run it and
-re-run the failed cell.
+**`NameError: name 'DATA_DIR' is not defined`** — the kernel is cold or 10a was
+skipped. Run sections 1, 2 and 10a, then re-run the failed cell.
 
 **`NameError` on `sweep`, `wands_sweep` or similar in a plotting cell** — plotting
 cells are separate from the cells that compute their data. Run the cell immediately
