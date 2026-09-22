@@ -8,8 +8,8 @@ what to do when something misbehaves in front of a room.
 
 | | |
 |---|---|
-| Prime before the talk | sections **1**, **2**, **10a** |
-| Live on stage | section **11**, at slide 21 |
+| Live on stage | **nothing** — every result is a slide |
+| Open as Q&A backup | sections **1**, **2**, **10a**, then **11** |
 | Total run time | about **7 seconds** |
 | Network needed | **no**, once the one-time prep below is done |
 
@@ -43,7 +43,7 @@ The first notebook run also pulls `all-MiniLM-L6-v2` (~90 MB) into
 
 `start_jupyter.sh` finds whichever virtualenv this checkout has, so you do not have
 to remember whether it is `venv` or `.venv`, and it fails loudly if `data/` is
-incomplete rather than letting you discover it in Part 5.
+incomplete rather than letting you discover it mid-demo.
 
 Then use **Kernel → Restart Kernel and Run All Cells**. It should
 finish in seconds with no errors and every figure drawn. That single check exercises
@@ -59,41 +59,36 @@ To confirm you are genuinely offline-safe, launch with the network switched off,
 
 ## What to run, and when
 
-Only one slide sends you to the notebook now. Part 2's attack result is on slide 10
-as a table, taken from section 9 rather than run live.
+**Nothing, during the talk.** Every notebook result now reaches the room as a slide.
+The notebook is Q&A backup: the closing slide's note has you keep it open on the
+convergence plot.
 
-### Before you walk on — sections 1, 2 and 10a
+### If someone asks and you want to show it
 
-Section 1 loads the model (about two seconds), section 2 sets up the toy index, and
-section 10a loads the cached WANDS data. Together about five seconds. This leaves the
-kernel holding everything section 11 needs, so Part 5 starts instantly.
+Run **sections 1, 2 and 10a**, then **section 11**. About seven seconds cold.
 
-### Slide 21 — "Demo: segments of real users"
-
-Run **section 11**.
-
-It will **not** run on a cold kernel. It needs `DATA_DIR`, `wands_vectors` and the PCA
+Section 11 will not run on its own. It needs `DATA_DIR`, `wands_vectors` and the PCA
 basis from section 10a, and `embedding_model` from section 1. A cold start gives you:
 
 ```
 NameError: name 'DATA_DIR' is not defined
 ```
 
-If that happens, run sections 1, 2 and 10a and carry on. You do not need sections 7, 8,
-9, 10b or 10c live — all of those are already slides.
+Priming those three before you walk on costs five seconds and means a Q&A request
+never turns into a wait.
 
 ## Section-to-cell map
 
 | Section | What it does | Needed live |
 |---|---|---|
-| 1 | Load the embedding model | yes |
-| 2 | Toy index and the imports section 11 uses | yes |
+| 1 | Load the embedding model | only to run 11 |
+| 2 | Toy index and the imports section 11 uses | only to run 11 |
 | 3–6 | The LDP engine, query embeddings, k-NN | no |
-| 7–8 | Epsilon sweep and the Laplace audit plot | no, slides 14 and 18 |
+| 7–8 | Epsilon sweep and the Laplace audit plot | no, slides 14, 15 and 18 |
 | 9 | Raw vector inversion, the privacy failure | no, slide 10 |
-| 10a | Fetch and cache WANDS, define the shared names | **yes** |
-| 10b–10c | Attack at scale, item vs class recovery | no, slide 15 |
-| 11 | Segments, individual vs crowd, convergence | yes |
+| 10a | Fetch and cache WANDS, define the shared names | only to run 11 |
+| 10b–10c | Attack at scale, item vs class recovery | no, slide 16 |
+| 11 | Segments, individual vs crowd, convergence | no, slides 18 to 20 |
 
 ## If something goes wrong
 

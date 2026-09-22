@@ -62,38 +62,36 @@ lossy encoding, not a privacy control.
 Read the 20 documents aloud. They fit in one breath, so the audience holds the whole index in
 their head and the result lands without any metric.
 
-### Part 3. The fix and the proof (slides plus notebook, 7 min)
+### Part 3. The fix and the proof (slides, 10 min)
 
 One slide: Laplace noise, scale is `sensitivity / epsilon`, epsilon is the dial.
 
 Then two verification beats, weakest to strongest.
 
-- Section 8, the tent histogram. The mechanism is distributionally what it claims.
-  `plots/08_laplace_tent_audit.png`
+- Section 8, the tent histogram. The mechanism is distributionally what it claims, and a
+  second panel shows the same audit at epsilon 10 so the dial is visible.
+  `plots/08_laplace_tent_audit.png`, `plots/08b_epsilon_spread_comparison.png`
 - Section 10, the attack curve. An actual adversary failing, measured. Stronger evidence,
   so give it more time. `plots/10_item_vs_class_recovery.png`
 
 This discharges "instead of just hoping the data is actually private".
 
-### Part 4. What it costs (notebook, 7 min)
-
-Section 7, on the toy index. The real index was already attacked in Part 3.
-
-Volunteer the weakness rather than letting it surface in questions. The section 9 demo was
-rigged at `epsilon = 1.2`: privacy excellent, utility destroyed, barely above random. Saying
-so yourself is what buys credibility for Part 5.
-
-The real-index finding, that the curves separate around `epsilon = 10` to `20`, now lives in
-Part 3. Refer back in a sentence if needed, but do not re-show the plot.
+Close the part on what the noise costs, using section 7 on the toy index. Volunteer the
+weakness rather than letting it surface in questions: the section 9 demo was rigged at
+`epsilon = 1.2`, privacy excellent and utility destroyed, barely above random. No slide says
+this any more, so it has to come from you over the plot. Saying it yourself is what buys
+credibility for the payoff that follows.
 
 `plots/07_epsilon_tradeoff_toy_index.png`
 
-### Part 5. What you keep (notebook, 8 min)
+### The payoff: what you keep (slides, 8 min)
 
-Section 11. The payoff, and the answer to Part 4.
+No divider slide marks this any more, so the turn is yours to make out loud. Section 11's
+result is the answer to what the noise costs, and it now reaches the room through the
+convergence slide rather than a live run.
 
 The noise is zero-mean, so it cancels across users. One person's query is unrecoverable, the
-trend across a cohort is exact. At `epsilon = 1.0`, heavier noise than anything in Part 4, all
+trend across a cohort is exact. At `epsilon = 1.0`, heavier noise than anything earlier, all
 five cohorts are identified correctly from noised data alone while individual recovery sits at
 roughly chance.
 
@@ -101,12 +99,16 @@ The convergence plot is the centrepiece. Error falls as `1 / sqrt(n)`, matching 
 crosses the spread of the index at a few thousand users. That is the practical takeaway: this
 works if your segments have thousands of users, not if they have dozens.
 
+Close on how to choose epsilon, now that every step has evidence behind it: pick it for the
+privacy you need, measure what it buys on your own index, check your segments against the
+error curve, and raise users rather than epsilon when a segment falls short.
+
 Frame the constraint correctly. LDP does not cost you analytics, it costs you the ability to
 ask about one person. Every input relevance tuning needs is a population statistic.
 
 `plots/11_aggregate_convergence.png`
 
-### Part 6. Back in OpenSearch (slides, 7 min)
+### Part 4. Back in OpenSearch (slides, 7 min)
 
 Where injection sits in `ubi.js`: on the device, before the event is sent. What dashboards can
 still compute, and what they cannot. Then the limits, plainly, because each is a question
@@ -116,8 +118,8 @@ someone will ask anyway.
 - What a given epsilon buys you does not transfer between indexes, because what matters is the
   noise scale relative to the spread of the coordinates. The toy index and the 43k index are
   not comparable on this axis.
-- Low-traffic segments stay unmeasurable. The tail never reaches the population sizes Part 5
-  depends on.
+- Low-traffic segments stay unmeasurable. The tail never reaches the population sizes the
+  payoff depends on.
 - Section 11 covers query vectors. Clicks are counts rather than vectors and want a different
   mechanism, typically randomized response.
 
@@ -194,9 +196,10 @@ vocabulary, and it destroys the semantic structure that makes aggregation useful
 
 Full runbook in [RUNNING_THE_DEMO.md](RUNNING_THE_DEMO.md). The essentials:
 
-- Section 11 in Part 5 is the only live notebook moment. Prime the kernel before you walk on:
-  sections 1 and 2 for the model, then 10a for the cached data, about five seconds in total.
-- Section 11 raises a NameError without 10a.
+- Nothing is run live any more. Every result is a slide, and the notebook is open only as
+  Q&A backup.
+- If you do open it, section 11 needs sections 1, 2 and 10a in the kernel first, about five
+  seconds. It raises a NameError without 10a.
 - `plots/` is in the deck as backup images, so a dead kernel costs you nothing visible.
 - Verify offline with the wifi off. The model and the WANDS cache are both local after the
   first run.
@@ -204,9 +207,9 @@ Full runbook in [RUNNING_THE_DEMO.md](RUNNING_THE_DEMO.md). The essentials:
 
 ## Cutting to 20 minutes
 
-Keep Parts 1, 2 and 5. Compress Part 3 to the attack curve alone and drop the tent histogram to
-a slide. Drop Part 4 entirely and state the tradeoff in one sentence over the section 10 plot.
-Keep the limits from Part 6, shortened to a single slide.
+Keep Parts 1 and 2 and the payoff. Compress Part 3 to the attack curve alone, dropping the
+tent histogram, the spread comparison and the epsilon sweep, and state the tradeoff in one
+sentence over the section 10 plot. Keep the limits from Part 4, shortened to a single slide.
 
 The three that cannot go are the problem, the proof that embeddings leak, and the proof that
 aggregates survive.

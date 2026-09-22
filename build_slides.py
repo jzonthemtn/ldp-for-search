@@ -111,6 +111,7 @@ SLIDES = [
             "Telling users not to enter PII or PHI does not stop them",
             "`client_id` and `session_id` make it linkable across time",
             "Zero-trust becomes a blocker to relevance tuning",
+            "This applies to any behavioral data, not just search tuning",
         ],
         "accent": WARN,
     }, "Be specific. Legal does not object to 'search data' in the abstract. They object to "
@@ -174,7 +175,7 @@ SLIDES = [
        "Two things to be straight about if asked. This is a "
        "nearest-neighbour lookup against the index rather than literal text inversion, which "
        "is a weaker attacker than the Morris paper on the previous slide assumes, and it still "
-       "succeeds. And epsilon 1.2 is the rigged setting Part 4 comes back and confesses to."),
+       "succeeds. And epsilon 1.2 is the rigged setting the epsilon sweep later confesses to."),
 
     ("bullets", {
         "title": "The raw vector gives up the intent",
@@ -215,18 +216,43 @@ SLIDES = [
        "the deck with no definition behind it."),
 
     ("image", {
-        "title": "Verification 1: the noise is what we claim",
+        "title": "Verification 1: the noise",
         "path": "08_laplace_tent_audit.png",
-        "caption": "A biased mechanism would put the peak off the red line, and the width is "
+        "caption": "A biased mechanism would put the peak off the red line, and the spread is "
                    "the privacy.",
     }, "This is the distributional check. It proves the mechanism is implemented correctly. It "
-       "does not prove an attacker fails, which is why the next slide exists."),
+       "does not prove an attacker fails, which is why the next slide exists. Say what the "
+       "thousand is, because the title does not: one query, one coordinate of its vector, and "
+       "a thousand independent noise draws on that same true value. You cannot audit a random "
+       "mechanism from one sample, so you repeat it until the shape shows. Then head off the "
+       "objection someone in the room is already forming. Yes, averaging those thousand draws "
+       "recovers the true value, which is exactly what the peak landing on the red line shows. "
+       "That is the auditor's view rather than a usage pattern: a query is privatized once, on "
+       "submit. The moment one person emits the same query a thousand times, an attacker can "
+       "average it back, which is why the appendix says privatize on submit and never per "
+       "keystroke. It is the asymmetry the payoff rests on, pointed the other way. Many draws from one "
+       "person breaks privacy, one draw each from many people preserves it."),
+
+    ("image", {
+        "title": "A higher epsilon is a narrower spread",
+        "path": "08b_epsilon_spread_comparison.png",
+        "caption": "Both panels share one x axis. At epsilon 10 almost every draw lands on "
+                   "the red line.",
+    }, "The dial, made visible. Same query, same coordinate, same thousand draws. Only epsilon "
+       "differs. The scale is one over epsilon, so 1.2 gives 0.833 and 10 gives 0.100, about "
+       "eight times narrower. Say why the shared x axis matters: let each panel scale itself "
+       "and they look identical, which is the opposite of the point. Then land both halves of "
+       "the trade. At epsilon 10 the noise is finally smaller than the index itself, 0.141 "
+       "against a coordinate spread of 0.171, which is why the next part shows utility jumping "
+       "from 0.72 to 0.98 between epsilon 5 and 10. And that is also the cost: a spread this "
+       "narrow means someone reading a single sample is reading the true value. There is no "
+       "setting that is private and accurate for one query, which is what the payoff slides "
+       "exist to answer."),
 
     ("image", {
         "title": "Verification 2: measure an actual attacker",
         "path": "10_item_vs_class_recovery.png",
-        "caption": "The category leaks well before the item does. At epsilon 1, neither is "
-                   "usable.",
+        "caption": "The category leaks well before the item does.",
         "note": {"lead": "Data: WANDS, Wayfair product search relevance (ECIR 2022), MIT licensed:",
                  "text": "github.com/wayfair/WANDS",
                  "url": "https://github.com/wayfair/WANDS"},
@@ -243,45 +269,29 @@ SLIDES = [
        "first, not that the item is safe. This is where the limitations slide gets its first "
        "bullet, so it lands later as a callback rather than a new admission."),
 
-    # ---------------- Part 4. The cost ----------------
-    ("section", {"eyebrow": "Part 4", "title": "What it costs"},
-     "About 7 minutes. Volunteer the weakness before anyone asks. This buys credibility for Part 5."),
-
-    ("bullets", {
-        "title": "That first demo was rigged",
-        "bullets": [
-            "It ran at epsilon 1.2 on a 20 document index",
-            "The attacker learned nothing, and neither did the user",
-        ],
-        "accent": WARN,
-    }, "Say this yourself. If it comes out in Q&A instead, the talk loses. Volunteering it is "
-       "what makes Part 5 believable."),
-
     ("image", {
         "title": "Epsilon 1.2 is barely better than guessing",
         "path": "07_epsilon_tradeoff_toy_index.png",
-        "caption": "The red line is where the first demo ran. Utility only comes back where "
+        "caption": "The red line is where the Part 2 demo ran. Utility only comes back where "
                    "the attacker wins too.",
-    }, "Go to the red line first and stay there. That is the demo from Part 2, with the top "
-       "hit correct 7 percent of the time against a 5 percent baseline, and the top five 45 "
-       "against 25. Barely above guessing, which is the confession from the previous slide "
-       "made visible. Then sweep right to make the second point, that utility only returns as "
+    }, "Volunteer the confession here, because no slide makes it for you any more. That demo "
+       "back in Part 2 was rigged: epsilon 1.2 on a twenty document index, where the attacker "
+       "learned nothing and neither did the user. Say it yourself. If it comes out in Q&A "
+       "instead, the talk loses, and volunteering it is what makes the payoff believable. Go to "
+       "the red line first and stay there. That is the demo from Part 2, with the top hit "
+       "correct 7 percent of the time against a 5 percent baseline, and the top five 45 "
+       "against 25. Barely above guessing. Then sweep right to make the second point, that utility only returns as "
        "epsilon rises, and by then the attacker is reading the query too. Note the curves rise "
-       "here where slide 15's rose for the attacker: up means the search still works. Exact "
+       "here where slide 16's rose for the attacker: up means the search still works. Exact "
        "values if asked: at epsilon 1.2, P@1 0.07 and R@5 0.45; at 3, 0.38 and 0.75; at 5, "
        "0.72 and 0.95; at 10, 0.98 and 1.00. Resist calling epsilon 3 to 5 a usable window. "
        "P@1 of 0.38 is eight times chance, so the attacker is already doing well there. The "
        "honest version of that argument needs the real index, which is the next slide."),
 
-    # ---------------- Part 5. What you keep ----------------
-    ("section", {"eyebrow": "Part 5", "title": "What you keep"},
-     "About 8 minutes. This is the payoff and the answer to Part 4. Give it the most room."),
-
     ("bullets", {
-        "title": "The asymmetry is the whole point",
+        "title": "You lose the person and keep the pattern",
         "bullets": [
-            "Laplace noise is zero-mean",
-            "It cancels when you average over many independent users",
+            "The noise cancels when you average over many users",
             "One person's query is unrecoverable",
             "The trend across ten thousand people is not",
             "That trend is all UBI needs to tune relevance",
@@ -291,31 +301,19 @@ SLIDES = [
     }, "This is the conceptual core of the talk. Everything before it was setup. LDP is not a "
        "privacy tax, it is a trade of individual resolution for population accuracy."),
 
-    ("demo", {
-        "title": "Demo: segments of real users",
-        "lines": [
-            "Notebook section 11",
-            "480 real queries from Wayfair's WANDS dataset, grouped into 5 segments",
-            "Every user privatizes independently, on their own device",
-        ],
-    }, "This is the only live notebook moment in the talk, so have the kernel primed before "
-       "you walk on: run sections 1 and 2 for the model, then 10a for the cached data. Section "
-       "11 raises a NameError without 10a. If the kernel died, those three take about five "
-       "seconds. "
-       "Stress that no one in a segment sends a readable query, and the server does the aggregation "
-       "on noised vectors only. There is no trusted intermediate step. Read the result off the "
-       "notebook rather than a slide, because both halves matter. Individual recovery per segment "
-       "runs 0.020, 0.020, 0.063, 0.070 and 0.030 against chance of 0.014 to 0.031, so roughly "
-       "one to two and a half times chance, which is not usable. Segment identification is "
-       "5 of 5, exact. Same data, same epsilon of 1.0, two different questions."),
-
     ("image", {
         "title": "Error falls as 1 / sqrt(users)",
         "path": "11_aggregate_convergence.png",
         "lead": "Average the noised queries of `n` users in one segment, then see how far that "
                 "average lands from the truth.",
         "caption": "The red line is the smallest segment you can measure.",
-    }, "The centerpiece. Take the shape first. More users, less error. The measured green "
+    }, "The centerpiece, and now the only place section 11's result appears, so open with it. "
+       "480 real WANDS queries in five segments, every user privatizing independently on their "
+       "own device, no readable query anywhere and no trusted intermediate step. Individual "
+       "recovery per segment runs 0.020, 0.020, 0.063, 0.070 and 0.030 against chance of 0.014 "
+       "to 0.031, roughly one to two and a half times chance, which is not usable. Segment "
+       "identification is 5 of 5, exact. Same data, same epsilon of 1.0, two different "
+       "questions. Then the plot. Take the shape first. More users, less error. The measured green "
        "line tracks the predicted grey one across four orders of magnitude. This is ordinary "
        "statistics, so say so: averaging n independent things shrinks the noise as one over "
        "root n, the same reason a poll of four thousand beats one of one thousand. Nothing "
@@ -342,13 +340,32 @@ SLIDES = [
        "root n, so the threshold scales as one over epsilon squared. At epsilon 0.5 it is "
        "about 9,200 users, at epsilon 2 it is about 575."),
 
+    ("bullets", {
+        "title": "So how do you pick epsilon",
+        "bullets": [
+            "Start at epsilon 1, then measure",
+            "Pick it for the privacy you need, because utility also depends on the number of users",
+            "Segments too small? Add users or widen them, and leave epsilon alone",
+        ],
+        "accent": ACCENT,
+        "emphasize": -1,
+    }, "The question everyone is holding, answered now that they have seen the evidence for "
+       "every step. Step one is the reframe: there is no epsilon that is private and accurate "
+       "for one query, so stop looking for it on the tradeoff curve. Point back to the attack "
+       "curve for step two, because that is how you measure what an epsilon buys on an index "
+       "you actually run. Step three is the convergence plot and the previous slide. Step four "
+       "is the whole talk in one line: error goes as one over epsilon times one over root n, "
+       "so privacy rides on epsilon alone while accuracy has two dials, and n is the one that "
+       "costs nothing. If someone wants a starting number, say epsilon 1 on an index like "
+       "this one and then measure, rather than giving them a figure to carry home unexamined."),
+
     ("statement", {
         "text": "LDP does not cost you your analytics.\nIt costs you the ability to ask about one person.",
     }, "The reframe. Every input relevance tuning actually needs is a population statistic. Let "
        "this sit on screen for a beat before moving on."),
 
-    # ---------------- Part 6. Back to OpenSearch ----------------
-    ("section", {"eyebrow": "Part 6", "title": "Back in OpenSearch"},
+    # ---------------- Part 4. Back to OpenSearch ----------------
+    ("section", {"eyebrow": "Part 4", "title": "Back in OpenSearch"},
      "About 7 minutes. Land the integration, then be honest about what does not work."),
 
     ("bullets", {
@@ -407,9 +424,9 @@ SLIDES = [
     ("bullets", {
         "title": "The limitations",
         "bullets": [
-            "The category leaks and that is worse for medicine than furniture",
-            "What a given epsilon buys you depends on coordinate spread so it does not transfer between indexes",
-            "Low-traffic segments stay unmeasurable",
+            "The category leaks and that is worse for healthcare than furniture",
+            "Epsilon values don't transfer between indexes",
+            "Long tail queries stay unmeasurable",
             "This protects `user_query` but `ubi_events` still holds clicks and ids in the clear",
         ],
         "accent": WARN,
@@ -424,7 +441,7 @@ SLIDES = [
        "PCA keeps sensitivity itself stable whatever the catalogue holds. Asked whether "
        "privacy decays over time, say yes but not through epsilon: one user's repeated "
        "queries compose, and an attacker who averages that one user's own noised draws "
-       "recovers the intent, which is the asymmetry from Part 5 turned around. Epsilon is a "
+       "recovers the intent, which is the asymmetry of the payoff turned around. Epsilon is a "
        "budget per release rather than a standing property, so the fix is rotating or "
        "dropping client_id and session_id, not a smaller epsilon. On the long tail, which "
        "someone will ask about: "
@@ -444,8 +461,8 @@ SLIDES = [
         "bullets": [
             "Storing embeddings instead of text is not privacy",
             "Keeping sensitive data out of the index beats redacting it later",
-            "Verify the mechanism by attacking it, not by trusting it",
-            "You trade individual resolution for population accuracy, and relevance only needs the latter",
+            "Verify the mechanism by testing it, not by trusting it",
+            "You trade individual resolution for population accuracy but that's what relevance tuning needs",
         ],
         "accent": ACCENT,
         "emphasize": -1,
@@ -461,7 +478,21 @@ SLIDES = [
         "qr_label": "Session feedback",
     }, "Have the notebook open on the convergence plot behind you during Q&A. Likely questions: "
        "formal DP guarantee, why PCA, composition across repeated queries from one user, why not "
-       "just hash the query."),
+       "just hash the query, and how you actually test the mechanism. That last one is the "
+       "takeaway slide's promise, so have the four checks ready, each catching something "
+       "different. One, audit the distribution, section 8: privatize one coordinate a thousand "
+       "times and confirm the peak sits on the true value and the spread is sensitivity over "
+       "epsilon. That catches a mechanism that is not what you claim, a wrong scale or a sign "
+       "error, and it is cheap. Two, run an actual attacker, section 10: noise a query, do "
+       "nearest neighbour against your real index, and score item and class recovery against "
+       "chance across an epsilon sweep. That catches correctly implemented but still leaking, "
+       "which is the one that matters. Three, measure the utility cost, section 7, so you know "
+       "what the epsilon test two approved leaves you. Four, check the convergence, section 11: "
+       "confirm error falls as one over root n. That catches noise that is not independent "
+       "across users, a reused seed or a per-session draw, because correlated noise does not "
+       "cancel and the measured line flattens away from theory. Two things worth saying: none "
+       "of this needs production data, and tests two and four are the ones people skip and the "
+       "ones that find real problems."),
 ]
 
 
@@ -1028,8 +1059,8 @@ standard deviation of the index vectors, `wands_vectors.std(axis=0).mean()`, whi
 0.128 for the 20-dimension WANDS basis. Epsilon only means something relative to that
 number. A different corpus, or the same corpus at a different number of components, gives
 a different spread and therefore a different usable epsilon. That is the whole content of
-"epsilon does not transfer between indexes", and it is also why the toy index in Part 4
-needed epsilon 1.2 while the real one is discussed at 1 to 20.
+"epsilon does not transfer between indexes", and it is also why the toy index needed
+epsilon 1.2 while the real one is discussed at 1 to 20.
 """
 
 
