@@ -312,7 +312,25 @@ Tie back to the abstract's promise about LTR and query-intent analysis. Then nam
 
 ---
 
-## 28. The limitations
+## 28. Training learning-to-rank on noised queries
+
+*The labels were never protected, so what changes is what you key them on*
+
+|  | Classic LTR | Under LDP |
+|---|---|---|
+| Labels | Clicks | Clicks |
+| Keyed on | The query | The segment |
+| Query features | BM25 and term matches | The segment centroid |
+
+`ubi_events` still shows which results were clicked
+
+Intent-based ranking profiles: for bed shoppers, boost these attributes
+
+This expands the learning-to-rank bullet on the previous slide, and it is the one place to be careful, because it is a recipe rather than a result. Nothing in this talk trains a ranker. Say so if asked. What is measured is the inputs: clicks were never touched by the mechanism, and the segment centroid is accurate above roughly 2,300 users. The labels are therefore exactly what they are today. What moves is the key. You cannot read a query, so you cannot build judgment lists per query string, and you cannot recompute BM25 against words you do not have. You group by segment instead and use its centroid as the query representation, which suits an embedding ranker and suits a term-based feature set badly. Walk the example slowly, it is the whole slide: a few thousand people search for beds, every one of them privatizes on their own device, and the server averages what arrives into a centroid that is accurate but belongs to nobody. The clicks sitting next to it were never noised. That pair, the centroid and the clicks, is a training example. Beds is the cohort behind the convergence plot, so this is the same segment they have already seen measured. Name the category honestly: this is closer to intent-based ranking profiles than to per-query learning-to-rank, and it is coarser, because every query in a segment collapses to one key. If someone asks how much that costs, say it has not been measured and that the two losses separate: keying on segments instead of queries is a modelling choice you can evaluate on clean data with no privacy involved, while the noise itself costs almost nothing above 2,300 users, which is what the convergence plot showed. Everything inherits the segment constraint from earlier: head segments train, the long tail does not reach the user count.
+
+---
+
+## 29. The limitations
 
 - The category leaks and that is worse for healthcare than furniture
 - Epsilon values don't transfer between indexes
@@ -323,7 +341,7 @@ Every one of these is a question someone will ask. Answering them first is cheap
 
 ---
 
-## 29. Takeaways
+## 30. Takeaways
 
 - Storing embeddings instead of text is not privacy
 - Keeping sensitive data out of the index beats redacting it later
@@ -334,7 +352,7 @@ Four sentences. If someone remembers only one, it should be the last.
 
 ---
 
-## 30. Questions
+## 31. Questions
 
 *github.com/jzonthemtn/ldp-for-search*
 
