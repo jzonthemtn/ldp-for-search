@@ -38,7 +38,7 @@ About 8 minutes. Goal is that everyone understands the problem before any code a
 - Relevance is measured
 - Which queries fire, which results get clicked, at which position
 - Learning-to-rank trains on exactly this signal
-- Without it you are guessing, and shipping guesses to production
+- Without measurement you are guessing
 
 ![](plots/04_relevance_loop.png)
 
@@ -51,7 +51,7 @@ Establish that behavioural data is not a nice-to-have. It is the input to the en
 - `ubi_queries`:  `user_query, query_id, client_id, timestamp`
 - `ubi_events`:  `action_name, object_id, position, session_id, page_id`
 - `ubi.js` collects interactions in the browser and ships them to the cluster
-- This is the raw material relevance tuning runs on
+- This is what we use to tune search
 
 ![](plots/05_ubi_pipeline.png)
 
@@ -61,7 +61,7 @@ Keep this factual and quick. The audience needs the field names because the next
 
 ---
 
-## 6. Legal rules won't let us see the user queries
+## 6. But what about when we don't know the user queries?
 
 - `user_query` is free text and can contain *anything*
 - Telling users not to enter PII or PHI does not stop them
@@ -99,7 +99,7 @@ About 5 minutes. This exists to kill the objection half the room is already form
 - "We will not store the text. We will store the embedding."
 - It's numbers, not words
 - It is not private, just a lossy encoding
-- Vector inversion recovers the intent
+- Intent can be recovered
 
 ![](plots/09_vector_inversion.png)
 
@@ -135,13 +135,33 @@ This is the result the rest of the talk builds on. Pause here.
 
 ---
 
-## 12. Part 3. The fix and the proof
+## 12. Part 3. The fix: Local Differential Privacy
 
 About 7 minutes. Mechanism briefly, then two verification beats, weakest to strongest.
 
 ---
 
-## 13. Local Differential Privacy
+## 13. Two places to add the noise
+
+*Differential privacy comes in two shapes, and the difference is who you trust*
+
+|  | Central DP | Local DP |
+|---|---|---|
+| Noise is added | After collection | On the device |
+| Who sees the raw data | A trusted curator | No one |
+| Who uses it | The 2020 US Census | Apple emoji trends |
+
+The Census Bureau sees every raw response, then noises what it publishes.
+
+Apple never sees your emoji, only a noised count from every phone.
+
+Apple, Learning with Privacy at Scale, 2017: <https://machinelearning.apple.com/research/learning-with-privacy-at-scale>
+
+Give the technique a reference point before defining it. Most of the room has heard that the 2020 US Census used differential privacy, and that is the central flavour: the Bureau collects every raw response, holds it, and adds noise to the tables it publishes. The guarantee is about what leaves the building. That works because there is a curator everyone is willing to trust, backed by law. Part 1 was the argument that we do not have one. Legal will not let the cluster hold readable queries, so the noise has to go in before anything is sent, which is the local flavour. Be honest about the price, because it is the whole reason central DP exists: noising one aggregate needs far less noise than noising every record, so central DP is much more accurate at the same epsilon. Everything after this slide is the cost of removing the curator, and whether the numbers still work. Apple and Google are the credibility point if anyone thinks local DP is academic. Apple has shipped it on iOS for years to learn which emoji and which QuickType suggestions are popular, and Google ships RAPPOR in Chrome. The emoji case is worth spelling out, because it is our problem exactly: they learn which emoji are trending across everyone without learning which emoji you sent. Swap emoji for queries and that is this talk.
+
+---
+
+## 14. Local Differential Privacy
 
 - The vector was never the problem, storing it readable was
 - Add calibrated noise to the query vector on the device
@@ -156,7 +176,7 @@ One slide only. Resist the urge to teach differential privacy properly, there is
 
 ---
 
-## 14. Verification 1: the noise
+## 15. Verification 1: the noise
 
 ![A biased mechanism would put the peak off the red line, and the spread is the privacy.](plots/08_laplace_tent_audit.png)
 
@@ -166,7 +186,7 @@ This is the distributional check. It proves the mechanism is implemented correct
 
 ---
 
-## 15. A higher epsilon is a narrower spread
+## 16. A higher epsilon is a narrower spread
 
 ![Both panels share one x axis. At epsilon 10 almost every draw lands on the red line.](plots/08b_epsilon_spread_comparison.png)
 
@@ -176,7 +196,7 @@ The dial, made visible. Same query, same coordinate, same thousand draws. Only e
 
 ---
 
-## 16. Verification 2: measure an actual attacker
+## 17. Verification 2: measure an actual attacker
 
 ![The category leaks well before the item does.](plots/10_item_vs_class_recovery.png)
 
@@ -188,7 +208,7 @@ Stronger evidence than the histogram, because it measures an adversary rather th
 
 ---
 
-## 17. Epsilon 1.2 is barely better than guessing
+## 18. Epsilon 1.2 is barely better than guessing
 
 ![The red line is where the Part 2 demo ran. Utility only comes back where the attacker wins too.](plots/07_epsilon_tradeoff_toy_index.png)
 
@@ -198,7 +218,7 @@ Volunteer the confession here, because no slide makes it for you any more. That 
 
 ---
 
-## 18. You lose the person and keep the pattern
+## 19. You lose the person and keep the pattern
 
 - The noise cancels when you average over many users
 - One person's query is unrecoverable
@@ -211,7 +231,7 @@ This is the conceptual core of the talk. Everything before it was setup. LDP is 
 
 ---
 
-## 19. Error falls as 1 / sqrt(users)
+## 20. Error falls as 1 / sqrt(users)
 
 *Average the noised queries of `n` users in one segment, then see how far that average lands from the truth.*
 
@@ -223,7 +243,7 @@ The centerpiece, and now the only place section 11's result appears, so open wit
 
 ---
 
-## 20. How big a segment has to be
+## 21. How big a segment has to be
 
 - Error drops below the spread of the index at roughly 2,300 users
 - That is at epsilon 1, and halving epsilon needs four times the users
@@ -235,7 +255,7 @@ Give the audience one operational number they can apply on Monday. This is it. T
 
 ---
 
-## 21. So how do you pick epsilon
+## 22. So how do you pick epsilon
 
 - Start at epsilon 1, then measure
 - Pick it for the privacy you need, because utility also depends on the number of users
@@ -245,19 +265,19 @@ The question everyone is holding, answered now that they have seen the evidence 
 
 ---
 
-## 22. LDP does not cost you your analytics. It costs you the ability to ask about one person.
+## 23. LDP does not cost you your analytics. It costs you the ability to ask about one person.
 
 The reframe. Every input relevance tuning actually needs is a population statistic. Let this sit on screen for a beat before moving on.
 
 ---
 
-## 23. Part 4. Back in OpenSearch
+## 24. Part 4. Back in OpenSearch
 
 About 7 minutes. Land the integration, then be honest about what does not work.
 
 ---
 
-## 24. Where the noise gets injected
+## 25. Where the noise gets injected
 
 - On the device, before `ubi.js` sends the event
 - Aggregation happens at query time over the noised data
@@ -272,7 +292,7 @@ Say up front that none of this is built into UBI today. ubi.js is a serializer, 
 
 ---
 
-## 25. What changes in ubi_queries
+## 26. What changes in ubi_queries
 
 ![](plots/28_ubi_document.png)
 
@@ -282,7 +302,7 @@ The integration question, answered concretely, and it needs no change to the UBI
 
 ---
 
-## 26. What your dashboards can still compute
+## 27. What your dashboards can still compute
 
 - Aggregate query intent per segment
 - Demand trends and shifts over time
@@ -293,7 +313,7 @@ Tie back to the abstract's promise about LTR and query-intent analysis. Then nam
 
 ---
 
-## 27. The limitations
+## 28. The limitations
 
 - The category leaks and that is worse for healthcare than furniture
 - Epsilon values don't transfer between indexes
@@ -304,7 +324,7 @@ Every one of these is a question someone will ask. Answering them first is cheap
 
 ---
 
-## 28. Takeaways
+## 29. Takeaways
 
 - Storing embeddings instead of text is not privacy
 - Keeping sensitive data out of the index beats redacting it later
@@ -315,7 +335,7 @@ Four sentences. If someone remembers only one, it should be the last.
 
 ---
 
-## 29. Questions
+## 30. Questions
 
 *github.com/jzonthemtn/ldp-for-search*
 

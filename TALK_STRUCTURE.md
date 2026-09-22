@@ -62,7 +62,7 @@ lossy encoding, not a privacy control.
 Read the 20 documents aloud. They fit in one breath, so the audience holds the whole index in
 their head and the result lands without any metric.
 
-### Part 3. The fix and the proof (slides, 10 min)
+### Part 3. The fix: Local Differential Privacy (slides, 10 min)
 
 One slide: Laplace noise, scale is `sensitivity / epsilon`, epsilon is the dial.
 

@@ -84,7 +84,7 @@ SLIDES = [
             "Relevance is measured",
             "Which queries fire, which results get clicked, at which position",
             "Learning-to-rank trains on exactly this signal",
-            "Without it you are guessing, and shipping guesses to production",
+            "Without measurement you are guessing",
         ],
         "image": {"path": "04_relevance_loop.png"},
     }, "Establish that behavioural data is not a nice-to-have. It is the input to the entire "
@@ -96,7 +96,7 @@ SLIDES = [
             "`ubi_queries`:  `user_query, query_id, client_id, timestamp`",
             "`ubi_events`:  `action_name, object_id, position, session_id, page_id`",
             "`ubi.js` collects interactions in the browser and ships them to the cluster",
-            "This is the raw material relevance tuning runs on",
+            "This is what we use to tune search",
         ],
         "image": {"path": "05_ubi_pipeline.png"},
         "link": {"text": "ubisearch.dev", "url": "https://ubisearch.dev",
@@ -105,7 +105,7 @@ SLIDES = [
        "points at three of them specifically."),
 
     ("bullets", {
-        "title": "Legal rules won't let us see the user queries",
+        "title": "But what about when we don't know the user queries?",
         "bullets": [
             "`user_query` is free text and can contain *anything*",
             "Telling users not to enter PII or PHI does not stop them",
@@ -146,7 +146,7 @@ SLIDES = [
             "\"We will not store the text. We will store the embedding.\"",
             "It's numbers, not words",
             "It is not private, just a lossy encoding",
-            "Vector inversion recovers the intent",
+            "Intent can be recovered",
         ],
         "image": {"path": "09_vector_inversion.png"},
         "note": {"lead": "Morris et al., Text Embeddings Reveal (Almost) As Much As Text:",
@@ -190,8 +190,41 @@ SLIDES = [
     }, "This is the result the rest of the talk builds on. Pause here."),
 
     # ---------------- Part 3. Mechanism and verification ----------------
-    ("section", {"eyebrow": "Part 3", "title": "The fix and the proof"},
+    ("section", {"eyebrow": "Part 3", "title": "The fix: Local Differential Privacy"},
      "About 7 minutes. Mechanism briefly, then two verification beats, weakest to strongest."),
+
+    ("table", {
+        "title": "Two places to add the noise",
+        "lead": "Differential privacy comes in two shapes, and the difference is who you trust",
+        "columns": ["", "Central DP", "Local DP"],
+        "rows": [
+            ["Noise is added", "After collection", "On the device"],
+            ["Who sees the raw data", "A trusted curator", "No one"],
+            ["Who uses it", "The 2020 US Census", "Apple emoji trends"],
+        ],
+        "body": [
+            "The Census Bureau sees every raw response, then noises what it publishes.",
+            "Apple never sees your emoji, only a noised count from every phone.",
+        ],
+        "note": {"lead": "Apple, Learning with Privacy at Scale, 2017:",
+                 "text": "machinelearning.apple.com",
+                 "url": "https://machinelearning.apple.com/research/learning-with-privacy-at-scale"},
+    }, "Give the technique a reference point before defining it. Most of the room has heard "
+       "that the 2020 US Census used differential privacy, and that is the central flavour: "
+       "the Bureau collects every raw response, holds it, and adds noise to the tables it "
+       "publishes. The guarantee is about what leaves the building. That works because there "
+       "is a curator everyone is willing to trust, backed by law. Part 1 was the argument that "
+       "we do not have one. Legal will not let the cluster hold readable queries, so the noise "
+       "has to go in before anything is sent, which is the local flavour. Be honest about the "
+       "price, because it is the whole reason central DP exists: noising one aggregate needs "
+       "far less noise than noising every record, so central DP is much more accurate at the "
+       "same epsilon. Everything after this slide is the cost of removing the curator, and "
+       "whether the numbers still work. Apple and Google are the credibility point if anyone "
+       "thinks local DP is academic. Apple has shipped it on iOS for years to learn which "
+       "emoji and which QuickType suggestions are popular, and Google ships RAPPOR in Chrome. "
+       "The emoji case is worth spelling out, because it is our problem exactly: they learn "
+       "which emoji are trending across everyone without learning which emoji you sent. Swap "
+       "emoji for queries and that is this talk."),
 
     ("bullets", {
         "title": "Local Differential Privacy",
@@ -902,7 +935,8 @@ def render_table(prs, d):
         cell.vertical_anchor = MSO_ANCHOR.MIDDLE
         para = cell.text_frame.paragraphs[0]
         para.alignment = PP_ALIGN.CENTER if c else PP_ALIGN.LEFT
-        _style(para.runs[0], 18, bold=True, color=PAPER)
+        if para.runs:
+            _style(para.runs[0], 18, bold=True, color=PAPER)
         cell.fill.solid()
         cell.fill.fore_color.rgb = ACCENT
 
@@ -913,18 +947,22 @@ def render_table(prs, d):
             cell.vertical_anchor = MSO_ANCHOR.MIDDLE
             para = cell.text_frame.paragraphs[0]
             para.alignment = PP_ALIGN.CENTER if c else PP_ALIGN.LEFT
-            _style(para.runs[0], 18, color=INK)
+            if para.runs:
+                _style(para.runs[0], 18, color=INK)
             cell.fill.solid()
             cell.fill.fore_color.rgb = (
                 RGBColor(0xF4, 0xF7, 0xFB) if rix % 2 else PAPER)
 
+    flow_bottom = table_top + 0.62 * (len(rows) + 1)
     if d.get("body"):
-        top = table_top + 0.62 * (len(rows) + 1) + 0.38
+        top = flow_bottom + 0.38
         box = _textbox(slide, Inches(1.65), Inches(top), Inches(10.0), Inches(1.9))
         for i, line in enumerate(d["body"]):
             para = box.paragraphs[0] if i == 0 else box.add_paragraph()
             para.space_after = Pt(8)
             _code_runs(para, line, 18, INK)
+        # 18pt plus the 8pt gap, so a citation underneath clears the last line.
+        flow_bottom = top + 0.36 * len(d["body"])
 
     if d.get("footnote"):
         note = _textbox(slide, Inches(0.9), Inches(6.5), Inches(11.5), Inches(0.7))
@@ -932,6 +970,10 @@ def render_table(prs, d):
         rn = note.paragraphs[0].add_run()
         rn.text = d["footnote"]
         _style(rn, 15, color=MUTED)
+
+    if d.get("note"):
+        top = max(6.92 if d.get("footnote") else 6.5, flow_bottom + 0.12)
+        _note_line(slide, d["note"], dark=False, top=Inches(top))
     return slide
 
 
