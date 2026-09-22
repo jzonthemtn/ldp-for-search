@@ -83,6 +83,7 @@ SLIDES = [
             "Relevance is measured",
             "What queries, what's clicked, and where",
             "Without measurement you are guessing",
+            "Learning-to-rank can't be trained on guesses",
         ],
         "image": {"path": "04_relevance_loop.png"},
     }, "Establish that behavioural data is not a nice-to-have. It is the input to the entire "

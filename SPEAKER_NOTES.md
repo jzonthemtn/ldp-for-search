@@ -37,6 +37,7 @@ About 8 minutes. Goal is that everyone understands the problem before any code a
 - Relevance is measured
 - What queries, what's clicked, and where
 - Without measurement you are guessing
+- Learning-to-rank can't be trained on guesses
 
 ![](plots/04_relevance_loop.png)
 
