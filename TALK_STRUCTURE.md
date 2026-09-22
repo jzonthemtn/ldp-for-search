@@ -36,9 +36,7 @@ Each commitment needs a moment on stage that discharges it, or the talk under-de
 
 ## Running order
 
-45 minute slot with 5 for questions. The 20 minute cut is at the end.
-
-### Part 1. The problem (slides, 8 min)
+### Part 1. The problem (slides)
 
 UBI and what it captures: `ubi_queries` with `user_query`, `query_id`, `client_id`, and
 `ubi_events` with `action_name`, `session_id`, `position`, `object_id`. This is the raw
@@ -52,7 +50,7 @@ Close on why scrubbing is the wrong shape of solution: you collected the PII fir
 only discover a failure after the fact. The alternative is that the sensitive value never
 leaves the device readable.
 
-### Part 2. Embeddings are not anonymization (slides, 5 min)
+### Part 2. Embeddings are not anonymization (slides)
 
 This kills the objection half the room is already forming, "we will just store the embedding
 instead of the text". Section 9's result is on a slide: the raw query vector inverts cleanly
@@ -62,7 +60,7 @@ lossy encoding, not a privacy control.
 Read the 20 documents aloud. They fit in one breath, so the audience holds the whole index in
 their head and the result lands without any metric.
 
-### Part 3. The fix: Local Differential Privacy (slides, 10 min)
+### Part 3. The fix: Local Differential Privacy (slides)
 
 One slide: Laplace noise, scale is `sensitivity / epsilon`, epsilon is the dial.
 
@@ -84,7 +82,7 @@ credibility for the payoff that follows.
 
 `plots/07_epsilon_tradeoff_toy_index.png`
 
-### The payoff: what you keep (slides, 8 min)
+### The payoff: what you keep (slides)
 
 No divider slide marks this any more, so the turn is yours to make out loud. Section 11's
 result is the answer to what the noise costs, and it now reaches the room through the
@@ -108,7 +106,7 @@ ask about one person. Every input relevance tuning needs is a population statist
 
 `plots/11_aggregate_convergence.png`
 
-### Part 4. Back in OpenSearch (slides, 7 min)
+### Part 4. Back in OpenSearch (slides)
 
 Where injection sits in `ubi.js`: on the device, before the event is sent. What dashboards can
 still compute, and what they cannot. Then the limits, plainly, because each is a question
@@ -205,7 +203,7 @@ Full runbook in [RUNNING_THE_DEMO.md](RUNNING_THE_DEMO.md). The essentials:
   first run.
 - Increase the JupyterLab font size before you start.
 
-## Cutting to 20 minutes
+## If you have to cut
 
 Keep Parts 1 and 2 and the payoff. Compress Part 3 to the attack curve alone, dropping the
 tent histogram, the spread comparison and the epsilon sweep, and state the tradeoff in one

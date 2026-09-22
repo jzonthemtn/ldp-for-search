@@ -28,7 +28,7 @@ Keep this to about 30 seconds. The redaction work is no longer a bullet but is s
 
 ## 3. Part 1. The problem
 
-About 8 minutes. Goal is that everyone understands the problem before any code appears.
+Everyone has to understand the problem before any code appears.
 
 ---
 
@@ -89,7 +89,7 @@ This is the 'move away from reactive data scrubbing' promise from the abstract. 
 
 ## 8. Part 2. Embeddings are not anonymization
 
-About 5 minutes. This exists to kill the objection half the room is already forming.
+This exists to kill the objection half the room is already forming.
 
 ---
 
@@ -136,7 +136,7 @@ This is the result the rest of the talk builds on. Pause here.
 
 ## 12. Part 3. The fix: Local Differential Privacy
 
-The longest part by far, about 25 minutes, because it carries the mechanism, the evidence, the cost and the payoff. Three evidence slides in order of strength, the distribution audit, then the epsilon comparison, then the attacker. Then what the noise costs, then what survives it. No divider marks the payoff any more, so the turn from the epsilon sweep to the asymmetry slide is yours to make out loud.
+The longest part by far, because it carries the mechanism, the evidence, the cost and the payoff. Three evidence slides in order of strength, the distribution audit, then the epsilon comparison, then the attacker. Then what the noise costs, then what survives it. No divider marks the payoff any more, so the turn from the epsilon sweep to the asymmetry slide is yours to make out loud.
 
 ---
 
@@ -272,7 +272,7 @@ The reframe. Every input relevance tuning actually needs is a population statist
 
 ## 24. Part 4. Back in OpenSearch
 
-About 7 minutes. Land the integration, then be honest about what does not work.
+Land the integration, then be honest about what does not work.
 
 ---
 

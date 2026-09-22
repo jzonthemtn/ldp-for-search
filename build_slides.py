@@ -76,7 +76,7 @@ SLIDES = [
 
     # ---------------- Part 1. The blocker ----------------
     ("section", {"eyebrow": "Part 1", "title": "The problem"},
-     "About 8 minutes. Goal is that everyone understands the problem before any code appears."),
+     "Everyone has to understand the problem before any code appears."),
 
     ("bullets", {
         "title": "To tune search you have to see what users do",
@@ -138,7 +138,7 @@ SLIDES = [
 
     # ---------------- Part 2. Embeddings leak ----------------
     ("section", {"eyebrow": "Part 2", "title": "Embeddings are not anonymization"},
-     "About 5 minutes. This exists to kill the objection half the room is already forming."),
+     "This exists to kill the objection half the room is already forming."),
 
     ("bullets", {
         "title": "The obvious first idea",
@@ -191,8 +191,8 @@ SLIDES = [
 
     # ---------------- Part 3. Mechanism and verification ----------------
     ("section", {"eyebrow": "Part 3", "title": "The fix: Local Differential Privacy"},
-     "The longest part by far, about 25 minutes, because it carries the mechanism, the "
-     "evidence, the cost and the payoff. Three evidence slides in order of strength, the "
+     "The longest part by far, because it carries the mechanism, the evidence, the cost "
+     "and the payoff. Three evidence slides in order of strength, the "
      "distribution audit, then the epsilon comparison, then the attacker. Then what the "
      "noise costs, then what survives it. No divider marks the payoff any more, so the turn "
      "from the epsilon sweep to the asymmetry slide is yours to make out loud."),
@@ -404,7 +404,7 @@ SLIDES = [
 
     # ---------------- Part 4. Back to OpenSearch ----------------
     ("section", {"eyebrow": "Part 4", "title": "Back in OpenSearch"},
-     "About 7 minutes. Land the integration, then be honest about what does not work."),
+     "Land the integration, then be honest about what does not work."),
 
     ("bullets", {
         "title": "Where the noise gets injected",
