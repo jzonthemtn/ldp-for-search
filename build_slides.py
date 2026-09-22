@@ -69,9 +69,10 @@ SLIDES = [
             "Works in search, NLP, and privacy",
         ],
         "link": {"text": "jeffzemerick.dev", "url": "https://jeffzemerick.dev"},
-    }, "Keep this to about 30 seconds. The credential that matters for this talk is the PII "
-       "redaction work, because it is why the privacy problem is familiar rather than academic. "
-       "The UBI maintainership is why the OpenSearch half is credible. Do not read the list."),
+    }, "Keep this to about 30 seconds. The redaction work is no longer a bullet but "
+       "is still worth saying out loud, because it is why the privacy problem is familiar "
+       "rather than academic. The UBI maintainership is why the OpenSearch half is credible. "
+       "Do not read the list."),
 
     # ---------------- Part 1. The blocker ----------------
     ("section", {"eyebrow": "Part 1", "title": "The problem"},
@@ -190,7 +191,11 @@ SLIDES = [
 
     # ---------------- Part 3. Mechanism and verification ----------------
     ("section", {"eyebrow": "Part 3", "title": "The fix: Local Differential Privacy"},
-     "About 7 minutes. Mechanism briefly, then two verification beats, weakest to strongest."),
+     "The longest part by far, about 25 minutes, because it carries the mechanism, the "
+     "evidence, the cost and the payoff. Three evidence slides in order of strength, the "
+     "distribution audit, then the epsilon comparison, then the attacker. Then what the "
+     "noise costs, then what survives it. No divider marks the payoff any more, so the turn "
+     "from the epsilon sweep to the asymmetry slide is yours to make out loud."),
 
     ("table", {
         "title": "Two places to add the noise",
@@ -238,8 +243,8 @@ SLIDES = [
                  "text": "en.wikipedia.org/wiki/Local_differential_privacy",
                  "url": "https://en.wikipedia.org/wiki/Local_differential_privacy"},
     }, "One slide only. Resist the urge to teach differential privacy properly, there is not "
-       "time and it is not the point of the talk. The noise is Laplace, but the word can wait "
-       "for the next slide, where the shape is on screen and does the explaining for you. If "
+       "time and it is not the point of the talk. The noise is Laplace, but the word appears "
+       "on no slide, so leave it out unless asked. The shape on the next slide explains it. If "
        "someone asks here, one sentence: symmetric noise, equally likely to push the value up "
        "or down, centered on the truth. The formula is deliberately off the slide. If someone "
        "asks, the noise scale is sensitivity over epsilon, and sensitivity here is 1.0 per "
@@ -253,7 +258,7 @@ SLIDES = [
         "caption": "A biased mechanism would put the peak off the red line, and the spread is "
                    "the privacy.",
     }, "This is the distributional check. It proves the mechanism is implemented correctly. It "
-       "does not prove an attacker fails, which is why the next slide exists. Say what the "
+       "does not prove an attacker fails, which is why the attacker slide two on exists. Say what the "
        "thousand is, because the title does not: one query, one coordinate of its vector, and "
        "a thousand independent noise draws on that same true value. You cannot audit a random "
        "mechanism from one sample, so you repeat it until the shape shows. Then head off the "
@@ -275,7 +280,7 @@ SLIDES = [
        "eight times narrower. Say why the shared x axis matters: let each panel scale itself "
        "and they look identical, which is the opposite of the point. Then land both halves of "
        "the trade. At epsilon 10 the noise is finally smaller than the index itself, 0.141 "
-       "against a coordinate spread of 0.171, which is why the next part shows utility jumping "
+       "against a coordinate spread of 0.171, which is why the epsilon sweep later shows utility jumping "
        "from 0.72 to 0.98 between epsilon 5 and 10. And that is also the cost: a spread this "
        "narrow means someone reading a single sample is reading the true value. There is no "
        "setting that is private and accurate for one query, which is what the payoff slides "
@@ -314,11 +319,12 @@ SLIDES = [
        "correct 7 percent of the time against a 5 percent baseline, and the top five 45 "
        "against 25. Barely above guessing. Then sweep right to make the second point, that utility only returns as "
        "epsilon rises, and by then the attacker is reading the query too. Note the curves rise "
-       "here where slide 16's rose for the attacker: up means the search still works. Exact "
+       "here where slide 17's rose for the attacker, so up means the search still works. Exact "
        "values if asked: at epsilon 1.2, P@1 0.07 and R@5 0.45; at 3, 0.38 and 0.75; at 5, "
        "0.72 and 0.95; at 10, 0.98 and 1.00. Resist calling epsilon 3 to 5 a usable window. "
        "P@1 of 0.38 is eight times chance, so the attacker is already doing well there. The "
-       "honest version of that argument needs the real index, which is the next slide."),
+       "honest version of that argument needed the real index, which is the attacker curve "
+       "you showed a slide ago."),
 
     ("bullets", {
         "title": "You lose the person and keep the pattern",
@@ -451,7 +457,8 @@ SLIDES = [
        "thing that genuinely goes away. If anyone presses on the learning-to-rank bullet, be "
        "straight: LTR judgments come from clicks, and this mechanism does not touch clicks, so "
        "that signal survives because it was never protected rather than because LDP preserved "
-       "it. The limitations slide says so."),
+       "it. The next slide shows how that training actually works, and the limitations slide "
+       "after it says what does not."),
 
     ("table", {
         "title": "Training learning-to-rank on noised queries",
