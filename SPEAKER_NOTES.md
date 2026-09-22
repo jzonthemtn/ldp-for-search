@@ -18,7 +18,6 @@ Open by naming the tension. We need behavioural data to tune relevance, and we a
 - Independent consultant at Mountain Fog
 - OpenSearch UBI and opensearch-migrations maintainer
 - Apache Software Foundation member, OpenNLP PMC Chair
-- PII redaction tooling at Philterd
 - Works in search, NLP, and privacy
 
 <https://jeffzemerick.dev>
@@ -36,8 +35,7 @@ About 8 minutes. Goal is that everyone understands the problem before any code a
 ## 4. To tune search you have to see what users do
 
 - Relevance is measured
-- Which queries fire, which results get clicked, at which position
-- Learning-to-rank trains on exactly this signal
+- What queries, what's clicked, and where
 - Without measurement you are guessing
 
 ![](plots/04_relevance_loop.png)
