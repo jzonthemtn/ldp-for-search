@@ -307,10 +307,9 @@ SLIDES = [
        "bullet, so it lands later as a callback rather than a new admission."),
 
     ("image", {
-        "title": "Epsilon 1.2 is barely better than guessing",
+        "title": "Search quality vs epsilon values",
         "path": "07_epsilon_tradeoff_toy_index.png",
-        "caption": "The red line is where the Part 2 demo ran. Utility only comes back where "
-                   "the attacker wins too.",
+        "caption": "Search quality only returns as the noise comes down",
     }, "Volunteer the confession here, because no slide makes it for you any more. That demo "
        "back in Part 2 was rigged: epsilon 1.2 on a twenty document index, where the attacker "
        "learned nothing and neither did the user. Say it yourself. If it comes out in Q&A "
@@ -337,69 +336,51 @@ SLIDES = [
         "image": {"path": "21_cancellation.png"},
         "accent": ACCENT,
     }, "This is the conceptual core of the talk. Everything before it was setup. LDP is not a "
-       "privacy tax, it is a trade of individual resolution for population accuracy."),
-
-    ("image", {
-        "title": "Error falls as 1 / sqrt(users)",
-        "path": "11_aggregate_convergence.png",
-        "lead": "Average the noised queries of `n` users in one segment, then see how far that "
-                "average lands from the truth.",
-        "caption": "The red line is the smallest segment you can measure.",
-    }, "The centerpiece, and now the only place section 11's result appears, so open with it. "
-       "480 real WANDS queries in five segments, every user privatizing independently on their "
-       "own device, no readable query anywhere and no trusted intermediate step. Individual "
-       "recovery per segment runs 0.020, 0.020, 0.063, 0.070 and 0.030 against chance of 0.014 "
-       "to 0.031, roughly one to two and a half times chance, which is not usable. Segment "
-       "identification is 5 of 5, exact. Same data, same epsilon of 1.0, two different "
-       "questions. Then the plot. Take the shape first. More users, less error. The measured green "
-       "line tracks the predicted grey one across four orders of magnitude. This is ordinary "
-       "statistics, so say so: averaging n independent things shrinks the noise as one over "
-       "root n, the same reason a poll of four thousand beats one of one thousand. Nothing "
-       "here is special to privacy. Then the red line. Read it off the bottom axis: 2,300 "
-       "users. That is the answer, and it is the next slide. If asked where 2,300 comes from, "
-       "it is where the measured error drops under 0.128, the average spread of one "
-       "coordinate across the index. That bar is strict on purpose. Two typical products sit "
-       "about 0.82 apart, so the line is roughly six times stricter than just telling "
-       "products apart."),
-
-    ("bullets", {
-        "title": "How big a segment has to be",
-        "bullets": [
-            "Error drops below the spread of the index at roughly 2,300 users",
-            "That is at epsilon 1, and halving epsilon needs four times the users",
-            "Segments with thousands of users are measurable under LDP",
-            "Segments with dozens are not measurable",
-            "Your head terms work, but your long tail does not",
-        ],
-        "accent": ACCENT,
-    }, "Give the audience one operational number they can apply on Monday. This is it. The "
-       "2,300 is where the measured error crosses the spread of the index, 0.128, on the "
-       "convergence plot. It is not a constant: error goes as one over epsilon times one over "
-       "root n, so the threshold scales as one over epsilon squared. At epsilon 0.5 it is "
-       "about 9,200 users, at epsilon 2 it is about 575."),
+       "privacy tax, it is a trade of individual resolution for population accuracy. No chart "
+       "backs this up any more, so carry section 11's result yourself. 480 real WANDS queries "
+       "in five segments, every user privatizing independently on their own device, no "
+       "readable query anywhere and no trusted intermediate step. Individual recovery per "
+       "segment runs 0.020, 0.020, 0.063, 0.070 and 0.030 against chance of 0.014 to 0.031, "
+       "so one to two and a half times chance, which is not usable. Segment identification is "
+       "5 of 5, exact. Same data, same epsilon of 1.0, two different questions. If anyone "
+       "wants the convergence behind it, the error falls as one over root n across four "
+       "orders of magnitude and the notebook plots it."),
 
     ("bullets", {
         "title": "So how do you pick epsilon",
         "bullets": [
             "Start at epsilon 1, then measure",
             "Pick it for the privacy you need, because utility also depends on the number of users",
+            "A segment needs roughly 2,300 users at epsilon 1, and halving epsilon needs four times that",
             "Segments too small? Add users or widen them, and leave epsilon alone",
+            "Your head terms work and your long tail does not",
         ],
         "accent": ACCENT,
         "emphasize": -1,
-    }, "The question everyone is holding, answered now that they have seen the evidence for "
+    }, "This now carries the one operational number they can apply on Monday, so slow down "
+       "on the third bullet. The 2,300 is where the measured error crosses the spread of the "
+       "index, 0.128, on the convergence plot in the notebook. That bar is strict on purpose, "
+       "since two typical products sit about 0.82 apart, and it is specific to this index. "
+       "It is not a constant, because "
+       "error goes as one over epsilon times one over root n, so the threshold scales as one "
+       "over epsilon squared, which puts it at about 9,200 users at epsilon 0.5 and about 575 "
+       "at epsilon 2. "
+       "The question everyone is holding, answered now that they have seen the evidence for "
        "every step. Step one is the reframe: there is no epsilon that is private and accurate "
        "for one query, so stop looking for it on the tradeoff curve. Point back to the attack "
        "curve for step two, because that is how you measure what an epsilon buys on an index "
-       "you actually run. Step three is the convergence plot and the previous slide. Step four "
+       "you actually run. Step three is the third bullet here. Step four "
        "is the whole talk in one line: error goes as one over epsilon times one over root n, "
        "so privacy rides on epsilon alone while accuracy has two dials, and n is the one that "
        "costs nothing. If someone wants a starting number, say epsilon 1 on an index like "
        "this one and then measure, rather than giving them a figure to carry home unexamined."),
 
     ("statement", {
-        "text": "LDP does not cost you your analytics.\nIt costs you the ability to ask about one person.",
-    }, "The reframe. Every input relevance tuning actually needs is a population statistic. Let "
+        "text": "LDP does not cost you search tuning.\nIt costs you exact queries.",
+    }, "The reframe. Every input relevance tuning actually needs is a population statistic. "
+       "Say queries rather than people, because the identifiers are still in the clear and "
+       "the limitations slide admits it shortly. Exact is doing work too, since the category "
+       "still leaks at a usable epsilon, which is the first limitation you show. Let "
        "this sit on screen for a beat before moving on."),
 
     # ---------------- Part 4. Back to OpenSearch ----------------
@@ -451,7 +432,7 @@ SLIDES = [
             "Aggregate query intent per segment",
             "Demand trends and shifts over time",
             "Segment-level training signal for learning-to-rank",
-            "What they cannot do is show you one user's session",
+            "What they cannot do is show you a specific user's session",
         ],
     }, "Tie back to the abstract's promise about LTR and query-intent analysis. Then name the "
        "thing that genuinely goes away. If anyone presses on the learning-to-rank bullet, be "
