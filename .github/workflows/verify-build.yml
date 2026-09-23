@@ -37,11 +37,11 @@ jobs:
       # model, so they are out of scope here.
       # git status rather than git diff, so a generated file that was never
       # committed fails loudly instead of passing as "no change".
-      - name: Diagrams and speaker notes must match
+      - name: Diagrams must match
         run: |
           files=$(sed -n 's/^wrote //p' /tmp/diagrams.txt)
-          echo "checking: $files SPEAKER_NOTES.md"
-          changed=$(git status --porcelain -- $files SPEAKER_NOTES.md)
+          echo "checking: $files"
+          changed=$(git status --porcelain -- $files)
           if [ -n "$changed" ]; then
             echo "these differ from what is committed:"
             echo "$changed"

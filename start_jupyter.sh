@@ -5,8 +5,6 @@
 #     ./start_jupyter.sh              launch
 #     ./start_jupyter.sh --offline    launch with Hugging Face pinned to the local cache
 #     ./start_jupyter.sh --check      run the pre-flight checks and exit
-#
-# Presenting from this notebook? See RUNNING_THE_DEMO.md.
 
 set -euo pipefail
 
