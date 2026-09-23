@@ -489,11 +489,34 @@ SLIDES = [
        "this is the same segment they have already seen measured. Name the category honestly: "
        "this is closer to intent-based ranking profiles than to per-query learning-to-rank, "
        "and it is coarser, because every query in a segment collapses to one key. If someone "
-       "asks how much that costs, say it has not been measured and that the two losses "
-       "separate: keying on segments instead of queries is a modelling choice you can "
+       "asks how much that costs, the next slide measures it, and the two losses "
+       "separate cleanly. Keying on segments instead of queries is a modelling choice you can "
        "evaluate on clean data with no privacy involved, while the noise itself costs almost "
-       "nothing above 2,300 users, which is what the convergence plot showed. Everything inherits the segment constraint from earlier: "
-       "head segments train, the long tail does not reach the user count."),
+       "nothing above the threshold the convergence plot showed. Everything inherits the "
+       "segment constraint from earlier, so head segments train and the long tail does not "
+       "reach the user count."),
+
+    ("image", {
+        "title": "NDCG@10 Comparison",
+        "path": "12_ltr_segmentation.png",
+        "lead": "Each bar ranks the same judged products against a different vector, scored "
+                "as NDCG@10",
+        "note": {"lead": "233,430 graded judgments, 40 segments (arbitrarily chosen), "
+                         "epsilon 1 at 20,000 users a segment"},
+    }, "The one slide in this part with a measurement behind it, so lean on it. 472 WANDS "
+       "queries ranked against 233,430 graded judgments, scored as NDCG@10. The only thing "
+       "that changes between the three lines is the vector each query is ranked against. "
+       "Blue is the query itself at 0.763, which is the ceiling. Orange is the segment "
+       "centroid and green is that centroid recovered from noisy queries at epsilon 1, at "
+       "40 segments of roughly a dozen queries each. Point at the last two bars first, "
+       "because their being identical is the finding. The noise costs 0.001 here and never "
+       "more than 0.003 anywhere in the sweep, so the whole drop from the first bar is the "
+       "price of segmenting rather than the price of privacy. That price is real but it "
+       "moves with how finely you segment, running from 0.586 at five segments to 0.737 at "
+       "320, and the notebook has the full curve if anyone wants it. Two "
+       "caveats to volunteer. This ranks by vector distance rather than training a ranker, "
+       "which isolates the query representation instead of measuring a production system. "
+       "And 480 queries is a small corpus, so the numbers are indicative."),
 
     ("bullets", {
         "title": "The limitations",

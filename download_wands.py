@@ -36,7 +36,7 @@ csv.field_size_limit(min(sys.maxsize, 2**31 - 1))
 
 def download():
     DATA_DIR.mkdir(exist_ok=True)
-    for name in ("product.csv", "query.csv"):
+    for name in ("product.csv", "query.csv", "label.csv"):
         dest = DATA_DIR / name
         if dest.exists():
             print(f"{name}: already cached")
