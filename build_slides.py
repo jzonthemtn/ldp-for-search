@@ -510,7 +510,6 @@ SLIDES = [
             "The category leaks and that is worse for healthcare than furniture",
             "Epsilon values don't transfer between indexes",
             "Long tail queries stay unmeasurable",
-            "This protects `user_query` but `ubi_events` still holds clicks and ids in the clear",
         ],
         "accent": WARN,
     }, "Every one of these is a question someone will ask. Answering them first is cheaper than "
