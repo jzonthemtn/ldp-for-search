@@ -62,10 +62,10 @@ SLIDES = [
     ("bullets", {
         "title": "About me",
         "bullets": [
-            "Independent consultant at Mountain Fog",
+            "Independent consultant",
             "OpenSearch UBI and opensearch-migrations maintainer",
             "Apache Software Foundation member, OpenNLP PMC Chair",
-            "Works in search, NLP, and privacy",
+            "Works primarily in cloud, search, and NLP",
         ],
         "link": {"text": "jeffzemerick.dev", "url": "https://jeffzemerick.dev"},
     }, "Keep this to about 30 seconds. The redaction work is no longer a bullet but "
@@ -197,7 +197,7 @@ SLIDES = [
      "from the epsilon sweep to the asymmetry slide is yours to make out loud."),
 
     ("table", {
-        "title": "Two places to add the noise",
+        "title": "(Local) Differential Privacy",
         "lead": "Differential privacy comes in two shapes, and the difference is who you trust",
         "columns": ["", "Central DP", "Local DP"],
         "rows": [
@@ -350,14 +350,20 @@ SLIDES = [
         "bullets": [
             "Start at epsilon 1, then measure",
             "Pick it for the privacy you need, because utility also depends on the number of users",
-            "A segment needs roughly 2,300 users at epsilon 1, and halving epsilon needs four times that",
+            "A segment is any group you would slice a dashboard by",
             "Segments too small? Add users or widen them, and leave epsilon alone",
             "Your head terms work and your long tail does not",
         ],
         "accent": ACCENT,
         "emphasize": -1,
-    }, "This now carries the one operational number they can apply on Monday, so slow down "
-       "on the third bullet. The 2,300 is where the measured error crosses the spread of the "
+    }, "The first bullet is the only definition of a segment anywhere in the deck, so say it "
+       "rather than reading past it. In the notebook a segment is a topical cohort, everyone "
+       "searching for beds, but in production it is a storefront, a locale, an A/B arm or a "
+       "device type. The one constraint is that the grouping key has to be something the "
+       "server can see without reading the query, so it travels as metadata on the noised "
+       "submission. "
+       "The threshold itself is no longer on a slide, so it is yours to give if they want a "
+       "number. The 2,300 is where the measured error crosses the spread of the "
        "index, 0.128, on the convergence plot in the notebook. That bar is strict on purpose, "
        "since two typical products sit about 0.82 apart, and it is specific to this index. "
        "It is not a constant, because "
@@ -392,7 +398,7 @@ SLIDES = [
             "On the device, before `ubi.js` sends the event",
             "Aggregation happens at query time over the noised data",
             "Nothing downstream needs to be trusted, because nothing downstream has the original",
-            "You set epsilon in the client you ship",
+            "You set epsilon in the client",
         ],
         "note": {"lead": "An upcoming UBI RFC will bring this capability into `ubi.js`"},
         "image": {"path": "28_trust_boundary.png"},
